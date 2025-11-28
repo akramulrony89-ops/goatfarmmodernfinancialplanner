@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Goat Breeding Financial Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
+        .input-field { width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; transition: border-color 0.2s; }
+        .input-field:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
+        .label { font-weight: 500; color: #374151; }
+        .unit { color: #6B7280; font-size: 0.875rem; }
+        .section-title { font-size: 1.25rem; font-weight: 600; color: #111827; border-bottom: 2px solid #F3F4F6; padding-bottom: 0.75rem; margin-bottom: 1.5rem; }
+        .report-title { font-size: 1.75rem; font-weight: 700; text-align: center; margin-bottom: 1rem; }
+        .report-table { width: 100%; border-collapse: collapse; }
+        .report-table th, .report-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #E5E7EB; }
+        .report-table th { background-color: #F9FAFB; font-weight: 600; }
+        .sub-header td { background-color: #F3F4F6; font-weight: 600; }
+        .total-row td { font-weight: 700; }
+        .profit { color: #16A34A; }
+        .loss { color: #DC2626; }
+        .action-btn { display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 0.75rem; background-color: #4B5563; color: white; padding: 0.75rem; border-radius: 0.5rem; text-align: center; font-weight: 600; transition: background-color 0.2s; cursor: pointer; gap: 0.5rem; }
+        .action-btn:hover { background-color: #374151; }
+        .action-btn:disabled { background-color: #9CA3AF; cursor: not-allowed; }
+        .download-btn { background-color: #10B981; }
+        .download-btn:hover { background-color: #059669; }
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 2rem; border-radius: 0.75rem; max-width: 800px; width: 90%; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .fodder-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 500; cursor: pointer; transition: all 0.2s; border: 1px solid #D1D5DB; }
+        .fodder-btn.active { background-color: #1D4ED8; color: white; border-color: #1D4ED8; }
+        .sub-section-title { font-weight: 600; color: #1F2937; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .scenario-btn { transition: all 0.2s; border: 2px solid transparent; }
+        .scenario-btn.active { border-color: #2563EB; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4); }
+        .tooltip { position: relative; display: inline-block; }
+        .tooltip .tooltiptext { visibility: hidden; width: 220px; background-color: #555; color: #fff; text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -110px; opacity: 0; transition: opacity 0.3s; font-size: 0.75rem; }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+        .guide-content h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #111827; }
+        .guide-content p { margin-bottom: 0.75rem; color: #374151; }
+        .guide-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; color: #374151; }
+    </style>
+</head>
+<body class="bg-gray-50 p-4 sm:p-6 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-gray-800">Advanced Goat Breeding Financial Planner</h1>
+            <p class="text-lg text-gray-600 mt-2">A professional tool for projecting profitability of meat goat enterprises.</p>
+            <p class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-600 mt-4">Adapted from model by: MD AKRAMUL HAQUE, BCS (Livestock)</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Inputs -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Project Management -->
+                <div class="card p-6">
+                    <h2 class="section-title">Project Management</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                        <div>
+                            <label for="projectName" class="label">Project Name</label>
+                            <input type="text" id="projectName" class="input-field mt-1" placeholder="e.g., Q4 Goat Farm">
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="saveBtn" class="action-btn w-1/2">Save Project</button>
+                            <button id="loadBtn" class="action-btn w-1/2 bg-gray-700 hover:bg-gray-600">Load Project</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Basics -->
+                <div class="card p-6">
+                    <h2 class="section-title">1. Herd & Production Basics</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="totalDoes" class="label">Number of Does (Females)</label>
+                            <input type="number" id="totalDoes" class="input-field mt-1" value="50" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label for="totalBucks" class="label tooltip">Number of Bucks (Males)
+                                 <span class="tooltiptext">Recommended ratio is 1 buck per 20-25 does.</span>
+                            </label>
+                            <input type="number" id="totalBucks" class="input-field mt-1" value="2" oninput="calculate()">
+                        </div>
+                         <div>
+                            <label for="kiddingInterval" class="label tooltip">Kidding Interval (Months)
+                                <span class="tooltiptext">How often a doe gives birth. (e.g., 8 months for 3 kiddings in 2 years).</span>
+                            </label>
+                            <input type="number" id="kiddingInterval" class="input-field mt-1" value="8" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label for="kiddingRate" class="label tooltip">Kidding Rate (Kids/Doe)
+                                <span class="tooltiptext">Average number of kids per birth. (e.g., 1.8 for Black Bengal).</span>
+                            </label>
+                            <input type="number" step="0.1" id="kiddingRate" class="input-field mt-1" value="1.8" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label for="kidMortalityRate" class="label">Kid Mortality Rate (%)</label>
+                            <input type="number" id="kidMortalityRate" class="input-field mt-1" value="10" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label for="doeMortalityRate" class="label">Adult Mortality Rate (%)</label>
+                            <input type="number" id="doeMortalityRate" class="input-field mt-1" value="5" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label for="saleAgeKids" class="label">Sale Age of Kids (Months)</label>
+                            <input type="number" id="saleAgeKids" class="input-field mt-1" value="6" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label for="saleWeightKids" class="label">Sale Weight of Kids (Kg)</label>
+                            <input type="number" id="saleWeightKids" class="input-field mt-1" value="20" oninput="calculate()">
+                        </div>
+                         <div>
+                            <label for="cullRate" class="label tooltip">Annual Cull Rate (Does)
+                                <span class="tooltiptext">Percentage of adult does replaced (culled) each year. (e.g., 20% = 5-year herd life).</span>
+                            </label>
+                            <input type="number" id="cullRate" class="input-field mt-1" value="20" oninput="calculate()">
+                        </div>
+
+                        <div class="bg-blue-50 p-4 rounded-lg md:col-span-3">
+                            <h3 class="font-semibold text-blue-800">Annual Production Summary</h3>
+                            <div class="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                                <p>Kiddings per Year: <span id="kiddingsPerYear" class="font-bold">0.0</span></p>
+                                <p>Total Kids Born: <span id="totalKidsBorn" class="font-bold">0</span></p>
+                                <p>Surviving Kids: <span id="totalKidsSurviving" class="font-bold">0</span></p>
+                                <p>Kids Sold Yearly: <span id="totalKidsSold" class="font-bold">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Genetic Potential -->
+                <div class="card p-6">
+                    <h2 class="section-title">2. Genetic Potential & Breed Selection</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="breedSelection" class="label">Select Goat Breed</label>
+                            <select id="breedSelection" class="input-field mt-1">
+                                <option value="black_bengal">Black Bengal</option>
+                                <option value="jamunapari">Jamunapari Cross</option>
+                                <option value="boer">Boer Cross</option>
+                                <option value="barbari">Barbari</option>
+                                <option value="local_cross">Local Cross</option>
+                            </select>
+                            <div class="mt-4">
+                                <label for="geneticsScore" class="label">Genetic Quality Score: <span id="geneticsScoreLabel" class="font-bold">1.00 (Good)</span></label>
+                                <input type="range" id="geneticsScore" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mt-1" min="0.8" max="1.2" step="0.05" value="1.0">
+                            </div>
+                        </div>
+                        <div id="genetic-potential-output" class="bg-indigo-50 p-4 rounded-lg flex flex-col justify-center text-center">
+                            <!-- Genetic potential output will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Prediction -->
+                <div class="card p-6">
+                    <h2 class="section-title">3. AI-Powered Profitability Simulator</h2>
+                    <p class="text-sm text-gray-600 mb-4">Simulate an AI model to predict the optimal herd size (number of does) for maximizing annual net profit based on your current costs and market conditions.</p>
+                    <button id="runPredictionBtn" class="action-btn bg-slate-700 hover:bg-slate-800 w-full">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.28 9.03a5 5 0 1 0-10.56 0"></path><path d="M12 14.5A4.5 4.5 0 0 0 7.5 10h9a4.5 4.5 0 0 0-4.5 4.5z"></path><path d="M12 2v1"></path><path d="M12 21v1"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h1"></path><path d="M21 12h1"></path><path d="m4.93 19.07 1.41-1.41"></path><path d="m17.66 6.34 1.41-1.41"></path></svg>
+                        Find Optimal Herd Size
+                    </button>
+                </div>
+                
+                 <!-- Computer Vision -->
+                <div class="card p-6">
+                    <h2 class="section-title">4. Automated Health & Condition Monitoring</h2>
+                    <p class="text-sm text-gray-600 mb-4">Simulate a Computer Vision analysis to estimate the Body Condition Score (BCS) of your herd. BCS (on a 1-5 scale for goats) is a critical indicator of health and nutritional status.</p>
+                    <button id="runBCSBtn" class="action-btn bg-cyan-700 hover:bg-cyan-800 w-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        Analyze Body Condition (Simulated)
+                    </button>
+                </div>
+
+                <!-- Capital Expenditure -->
+                <div class="card p-6">
+                    <h2 class="section-title">5. Capital (Fixed) Expenditure</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        <div>
+                            <h3 class="sub-section-title">Infrastructure & Land</h3>
+                            <div class="bg-yellow-50 p-3 rounded-lg text-sm mb-4 space-y-1">
+                                <p>Housing/Infrastructure Land: <span id="landRequirement" class="font-bold">0.00</span> acres</p>
+                                <p>Fodder Production Land: <span id="fodderLandRequirement" class="font-bold">0.00</span> acres</p>
+                            </div>
+                            <div><label class="label">Land & Development Cost / Acre (BDT)</label><input type="number" id="landCostPerAcre" class="input-field mt-1" value="500000" oninput="calculate()"></div>
+                            <div class="mt-2 grid grid-cols-2 gap-4 items-start">
+                                <div>
+                                    <label class="label mb-2 block">Fodder Type & Yield</label>
+                                    <div id="fodder-type-selector" class="flex flex-wrap gap-2">
+                                        <button class="fodder-btn active" data-fodder="napier">Pakchong Napier</button>
+                                        <button class="fodder-btn" data-fodder="maize">Maize Grass</button>
+                                        <button class="fodder-btn" data-fodder="jackfruit">Jackfruit Leaves</button>
+                                        <button class="fodder-btn" data-fodder="custom">Custom</button>
+                                    </div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg text-center h-full flex flex-col justify-center">
+                                     <h4 class="font-semibold text-green-800 text-sm">Estimated Annual Yield</h4>
+                                     <p id="annualFodderProduction" class="text-xl font-bold text-green-700 mt-1">0.00 Tonnes</p>
+                                </div>
+                            </div>
+                            <div id="custom-fodder-yield-wrapper" class="mt-2 hidden">
+                                <label class="label">Custom Fodder Yield / Acre / Year (Kg)</label>
+                                <input type="number" id="fodderYield" class="input-field mt-1" value="20000" oninput="calculate()">
+                            </div>
+                            <div class="mt-2"><label class="label">Buildings & Sheds Cost (BDT)</label><input type="number" id="buildingCost" class="input-field mt-1" value="500000" oninput="calculate()"></div>
+                            <div class="mt-2"><label class="label">Equipment & Machinery (BDT)</label><input type="number" id="equipmentPrice" class="input-field mt-1" value="100000" oninput="calculate()"></div>
+                        </div>
+                         <div>
+                            <h3 class="sub-section-title">Livestock Purchase</h3>
+                            <div><label class="label">Purchase Price / Doe (BDT)</label><input type="number" id="doePrice" class="input-field mt-1" value="8000" oninput="calculate()"></div>
+                            <div class="mt-2"><label class="label">Purchase Price / Buck (BDT)</label><input type="number" id="buckPrice" class="input-field mt-1" value="15000" oninput="calculate()"></div>
+                             <div id="capital-summary" class="mt-4"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Operations, Income & Funding -->
+                <div class="card p-6">
+                    <h2 class="section-title">6. Operations, Income & Funding (Annual)</h2>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <!-- Feed Costs -->
+                        <div class="space-y-4 md:col-span-2">
+                             <h3 class="sub-section-title border-b pb-2">Feed Costs & Ration</h3>
+                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
+                                 <div>
+                                    <h4 class="font-semibold text-gray-700 mb-2">Ingredient Prices (BDT/Kg)</h4>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div><label class="label">Concentrate Price</label><input type="number" id="concentratePrice" class="input-field mt-1" value="45" oninput="calculate()"></div>
+                                        <div><label class="label">Green Roughage Price</label><input type="number" id="greenRoughagePrice" class="input-field mt-1" value="3" oninput="calculate()"></div>
+                                        <div><label class="label">Dry Roughage Price</label><input type="number" id="dryRoughagePrice" class="input-field mt-1" value="10" oninput="calculate()"></div>
+                                    </div>
+                                 </div>
+                                <div class="p-3 bg-indigo-50 rounded-lg">
+                                    <p class="font-semibold text-sm mb-2 text-center">Avg. Daily Ration per Adult Equivalent (Kg)</p>
+                                    <div class="flex gap-2"><label class="w-1/2">Concentrate</label><input type="number" step="0.1" id="feed_conc" class="input-field !p-1 text-sm" value="0.4" oninput="calculate()"></div>
+                                    <div class="flex gap-2 mt-1"><label class="w-1/2">Green Roughage</label><input type="number" id="feed_green" class="input-field !p-1 text-sm" value="2.0" oninput="calculate()"></div>
+                                    <div class="flex gap-2 mt-1"><label class="w-1/2">Dry Roughage</label><input type="number" id="feed_dry" class="input-field !p-1 text-sm" value="0.5" oninput="calculate()"></div>
+                                </div>
+                             </div>
+                             <button id="formulateRationBtn" class="action-btn bg-teal-600 hover:bg-teal-700 w-full mt-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+                                Advanced Ration Formulator
+                            </button>
+                        </div>
+                        <!-- Recurring Costs -->
+                        <div>
+                            <h3 class="sub-section-title">Operational Costs (Annual)</h3>
+                            <div class="mt-2"><label class="label">Laborer Salary/Head/Month</label><input type="number" id="laborSalary" class="input-field mt-1" value="10000" oninput="calculate()"></div>
+                             <div class="bg-green-50 p-3 rounded-lg text-sm my-4">
+                                 <p>Laborers Required (1 per 50 does): <span id="laborerCount" class="font-bold">1</span></p>
+                             </div>
+                            <div class="mt-2"><label class="label">Vet & Medicine/Goat/Year</label><input type="number" id="vetCostPerGoat" class="input-field mt-1" value="300" oninput="calculate()"></div>
+                            <div class="mt-2"><label class="label">Other Costs (Utilities, etc.) / Year</label><input type="number" id="otherCosts" class="input-field mt-1" value="25000" oninput="calculate()"></div>
+                        </div>
+                        <!-- Income -->
+                         <div>
+                            <h3 class="sub-section-title">Income Sources (Annual)</h3>
+                             <div>
+                                <label class="label">Sale Price/Kg Live Weight (Kids)</label>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <input type="number" id="salePricePerKg" class="input-field" value="550" oninput="calculate()">
+                                     <button id="fetchPriceBtn" title="Fetch Live Market Price" class="p-2 rounded-md bg-blue-500 hover:bg-blue-600 text-white transition-colors flex items-center justify-center">
+                                         <svg id="fetch-icon-static" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M3 2v6h6"></path><path d="M21 12A9 9 0 0 0 6 5.3L3 8"></path><path d="M21 22v-6h-6"></path><path d="M3 12a9 9 0 0 0 15 6.7l3-2.7"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mt-2"><label class="label">Avg. Sale Price / Cull Animal (BDT)</label><input type="number" id="cullPrice" class="input-field mt-1" value="5000" oninput="calculate()"></div>
+                            <div class="mt-2"><label class="label">Manure & Other Income / Year</label><input type="number" id="manureIncome" class="input-field mt-1" value="15000" oninput="calculate()"></div>
+                        </div>
+                        <!-- Funding -->
+                        <div class="space-y-4 md:col-span-2 border-t pt-4">
+                             <h3 class="sub-section-title">Capital Funding & Financials</h3>
+                             <div id="funding-summary" class="p-3 bg-gray-50 rounded-lg space-y-2 mb-4">
+                                <!-- This will be populated by JS -->
+                             </div>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                 <div class="space-y-2">
+                                     <div><label for="ownInvestment" class="label text-sm">Own Investment (BDT)</label><input type="number" id="ownInvestment" class="input-field mt-1" value="500000" oninput="calculate()"></div>
+                                     <div><label for="bankLoan" class="label text-sm">Bank Loan (BDT)</label><input type="number" id="bankLoan" class="input-field mt-1" value="1000000" oninput="calculate()"></div>
+                                 </div>
+                                 <div class="space-y-2">
+                                      <div><label class="label text-sm">Asset Depreciation/Year (%)</label><input type="number" id="depreciationRate" class="input-field mt-1" value="10" oninput="calculate()"></div>
+                                      <div><label class="label text-sm">Bank Interest Rate (Annual)</label><input type="number" id="interestRate" class="input-field mt-1" value="9" oninput="calculate()"></div>
+                                      <div><label class="label text-sm">Loan Term (Years)</label><input type="number" id="loanTerm" class="input-field mt-1" value="5" oninput="calculate()"></div>
+                                 </div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- Risk analysis -->
+                <div class="card p-6">
+                    <h2 class="section-title">7. Risk Analysis & Scenario Planning</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="sub-section-title">Risk Factors Assessment</h3>
+                            <div><label class="label">Disease Outbreak Probability (%)</label><input type="number" id="diseaseRisk" class="input-field mt-1" value="5" oninput="calculateRisk()"></div>
+                            <div class="mt-2"><label class="label">Feed Price Volatility (%)</label><input type="number" id="feedVolatility" class="input-field mt-1" value="15" oninput="calculateRisk()"></div>
+                            <div class="mt-2"><label class="label">Market Price Drop Risk (%)</label><input type="number" id="priceDropRisk" class="input-field mt-1" value="10" oninput="calculateRisk()"></div>
+                            <div id="risk-output" class="mt-4 p-3 bg-gray-100 rounded-lg text-center font-semibold">
+                                <!-- Risk level will be displayed here -->
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="sub-section-title">Profitability Scenarios</h3>
+                            <div id="scenario-buttons" class="space-y-2">
+                                <button class="w-full p-3 bg-blue-50 rounded-lg text-left scenario-btn" onclick="runScenario('best')">
+                                    <span class="font-semibold">Best Case</span><br>
+                                    <span class="text-sm text-gray-600">+10% sale price, -5% feed cost, +10% kidding rate</span>
+                                </button>
+                                <button class="w-full p-3 bg-gray-50 rounded-lg text-left scenario-btn active" onclick="runScenario('base')">
+                                    <span class="font-semibold">Base Case</span><br>
+                                    <span class="text-sm text-gray-600">Current assumptions</span>
+                                </button>
+                                <button class="w-full p-3 bg-red-50 rounded-lg text-left scenario-btn" onclick="runScenario('worst')">
+                                    <span class="font-semibold">Worst Case</span><br>
+                                    <span class="text-sm text-gray-600">-15% sale price, +20% feed cost, -10% kidding rate</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                         <button id="monteCarloBtn" class="action-btn bg-indigo-600 hover:bg-indigo-700 w-full">Run Monte Carlo Simulation (1000 runs)</button>
+                    </div>
+                </div>
+
+                <!-- Sustainability -->
+                <div class="card p-6">
+                    <h2 class="section-title">8. Sustainability & Environmental Impact</h2>
+                    <div id="sustainability-output" class="text-center p-4 rounded-lg bg-green-50">
+                        <!-- Sustainability metrics will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Financial Report -->
+            <div class="lg:col-span-1">
+                <div class="card p-4 sm:p-6 sticky top-8">
+                    <h2 class="report-title">Annual Financial Report</h2>
+                    <div id="report-summary"></div>
+                    <div id="report-container"><p class="text-center text-gray-500 p-4">Enter values to generate report.</p></div>
+                    <div class="mt-4 grid grid-cols-2 gap-2">
+                         <button id="guideBtn" class="action-btn col-span-2 bg-purple-600 hover:bg-purple-700">Goat Farm Setup Guide</button>
+                         <button id="geneticAnalysisBtn" class="action-btn col-span-2 bg-cyan-600 hover:bg-cyan-700">Genetic Analysis</button>
+                         <button id="steadyStateBtn" class="action-btn col-span-2 bg-orange-600 hover:bg-orange-700">Steady-State Herd Logic</button>
+                         <button id="kpiBtn" class="action-btn col-span-2">Key Performance Indicators</button>
+                         <button id="breakEvenBtn" class="action-btn col-span-2">Break-Even Analysis</button>
+                         <button id="projection5YearBtn" class="action-btn">5-Year Projections</button>
+                         <button id="loanRepaymentBtn" class="action-btn">Loan Repayment</button>
+                         <button id="fodderCalcBtn" class="action-btn">Fodder Requirement</button>
+                         <button id="fodderYieldBtn" class="action-btn">Fodder Yield</button>
+                         <button id="sustainabilityBtn" class="action-btn col-span-2 bg-green-600 hover:bg-green-700">Sustainability Report</button>
+                         <button id="amortizationBtn" class="action-btn">Loan Amortization</button>
+                         <button id="sensitivityBtn" class="action-btn">Sensitivity Analysis</button>
+                         <button id="visualizeBtn" class="action-btn">Visualize Costs</button>
+                         <button id="printBtn" class="action-btn download-btn">Print Report</button>
+                         <button id="downloadPdfBtn" class="action-btn download-btn col-span-2">Download PDF</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="text-center mt-10 py-4 text-gray-500 text-xs">
+            <p>&copy; 2025 Goat Financial Planner. Adapted from a model by MD AKRAMUL HAQUE, BCS (LIVESTOCK).</p>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="guideModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('guideModal')">&times;</span><h2 class="section-title">Comprehensive Guide to Goat Farming</h2><div id="guideContent" class="guide-content max-h-[70vh] overflow-y-auto pr-4"></div></div></div>
+    <div id="geneticAnalysisModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('geneticAnalysisModal')">&times;</span><h2 class="section-title">Genetic Potential Analysis</h2><div id="geneticAnalysisContent"></div></div></div>
+    <div id="steadyStateModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('steadyStateModal')">&times;</span><h2 class="section-title">Steady-State Herd Logic (Annual)</h2><div id="steadyStateContent"></div></div></div>
+    <div id="kpiModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('kpiModal')">&times;</span><h2 class="section-title">Key Performance Indicators (Annual)</h2><div id="kpiContent"></div></div></div>
+    <div id="breakEvenModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('breakEvenModal')">&times;</span><h2 class="section-title">Break-Even Analysis (Annual)</h2><div id="breakEvenContent"></div></div></div>
+    <div id="projection5YearModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('projection5YearModal')">&times;</span><h2 class="section-title">5-Year Financial Projections</h2><div id="projection5YearContent"></div></div></div>
+    <div id="amortizationModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('amortizationModal')">&times;</span><h2 class="section-title">Loan Amortization Schedule</h2><div id="amortizationContent"></div></div></div>
+    <div id="loanRepaymentModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('loanRepaymentModal')">&times;</span><h2 class="section-title">Annual Loan Repayment Capacity</h2><div id="loanRepaymentContent"></div></div></div>
+    <div id="chartModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('chartModal')">&times;</span><h2 class="section-title">Cost Structure Breakdown</h2><canvas id="financialChart"></canvas></div></div>
+    <div id="sensitivityModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('sensitivityModal')">&times;</span><h2 class="section-title">Sensitivity Analysis</h2><p class="text-gray-600 mb-4">Impact of a 10% change in key variables on Annual Net Profit.</p><div id="sensitivityContent"></div></div></div>
+    <div id="monteCarloModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('monteCarloModal')">&times;</span><h2 class="section-title">Monte Carlo Simulation Results</h2><div id="monteCarloContent"></div></div></div>
+    <div id="sustainabilityModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('sustainabilityModal')">&times;</span><h2 class="section-title">Sustainability & Environmental Impact Report</h2><div id="sustainabilityContent"></div></div></div>
+    <div id="fodderModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('fodderModal')">&times;</span><h2 class="section-title">Total Fodder Requirement Analysis</h2><div id="fodderContent"></div></div></div>
+    <div id="fodderYieldModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('fodderYieldModal')">&times;</span><h2 class="section-title">Fodder Production Analysis</h2><div id="fodderYieldContent"></div></div></div>
+    <div id="rationModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('rationModal')">&times;</span><h2 class="section-title">Advanced Ration Formulator</h2><div id="rationContent"></div></div></div>
+    <div id="predictionModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('predictionModal')">&times;</span><h2 class="section-title">Predictive Model Results</h2><div id="predictionContent"></div></div></div>
+    <div id="bcsModal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('bcsModal')">&times;</span><h2 class="section-title">Body Condition Score Analysis (1-5 Scale)</h2><div id="bcsContent"></div></div></div>
+
+
+    <!-- Notification Toast -->
+    <div id="notification" class="hidden fixed bottom-5 right-5 text-white py-3 px-5 rounded-lg shadow-lg transition-all duration-300 opacity-0 transform translate-y-2">
+        Notification message
+    </div>
+
+    <script>
+        // --- GLOBAL STATE ---
+        let reportData = {};
+        let financialChartInstance;
+        let activeFodder = 'napier'; // 'napier', 'maize', 'custom'
+        let baseValues = {}; // For scenario planning
+        let activeScenario = 'base'; // For scenario planning
+
+        // --- UTILITY FUNCTIONS ---
+        const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const setHTML = (id, html) => { if(document.getElementById(id)) document.getElementById(id).innerHTML = html };
+        const openModal = (id) => document.getElementById(id).style.display = 'block';
+        const closeModal = (id) => document.getElementById(id).style.display = 'none';
+        
+        function formatCurrency(value) {
+            if (isNaN(value)) return 'N/A';
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'BDT', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+        }
+
+        const debounce = (func, delay) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func.apply(this, a), delay); }; };
+        
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.remove('hidden', 'opacity-0', 'translate-y-2', 'bg-green-500', 'bg-red-500');
+            notification.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+            
+            // Trigger fade in
+            setTimeout(() => {
+                notification.classList.remove('opacity-0', 'translate-y-2');
+            }, 10);
+
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => notification.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        // --- CAPTURE BASE VALUES FOR SCENARIOS ---
+        function captureBaseValues() {
+            document.querySelectorAll('.input-field').forEach(input => {
+                baseValues[input.id] = input.value;
+            });
+            baseValues['activeFodder'] = activeFodder;
+            baseValues['breedSelection'] = document.getElementById('breedSelection').value;
+            baseValues['geneticsScore'] = document.getElementById('geneticsScore').value;
+        }
+        
+        // --- PROJECT SAVE/LOAD ---
+        function saveProject() {
+            if (!reportData.inputs) {
+                showNotification('Please calculate a report first.', true);
+                return;
+            }
+            const projectData = {
+                name: document.getElementById('projectName').value || 'Untitled Goat Project',
+                timestamp: new Date().toISOString(),
+                inputs: reportData.inputs, // reportData.inputs already has the calculated values (e.g., rate/100)
+            };
+            localStorage.setItem('goatProject', JSON.stringify(projectData));
+            showNotification('Project saved successfully!');
+        }
+
+        function loadProject() {
+            const saved = localStorage.getItem('goatProject');
+            if (saved) {
+                const project = JSON.parse(saved);
+                
+                // Populate inputs from saved data
+                Object.keys(project.inputs).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) {
+                        let value = project.inputs[key];
+                        // Handle percentages stored as decimals
+                        if (['kidMortalityRate', 'doeMortalityRate', 'cullRate', 'interestRate', 'depreciationRate'].includes(key)) {
+                            value *= 100;
+                        }
+                        el.value = value;
+                    }
+                });
+
+                // Handle nested feed object
+                if (project.inputs.feed) {
+                    Object.keys(project.inputs.feed).forEach(feedKey => {
+                        const elementId = `feed_${feedKey}`;
+                        if (document.getElementById(elementId)) {
+                            document.getElementById(elementId).value = project.inputs.feed[feedKey];
+                        }
+                    });
+                }
+                
+                // Load project name
+                if (project.name) document.getElementById('projectName').value = project.name;
+
+                // Handle toggles and selects
+                if (project.inputs.activeFodder) {
+                    activeFodder = project.inputs.activeFodder;
+                    document.querySelectorAll('#fodder-type-selector .fodder-btn').forEach(btn => {
+                       btn.classList.toggle('active', btn.dataset.fodder === activeFodder);
+                    });
+                    document.getElementById('custom-fodder-yield-wrapper').classList.toggle('hidden', activeFodder !== 'custom');
+                }
+                 if (project.inputs.breed) {
+                    document.getElementById('breedSelection').value = project.inputs.breed;
+                }
+                if (project.inputs.geneticsScore) {
+                    document.getElementById('geneticsScore').value = project.inputs.geneticsScore;
+                }
+
+                calculateGeneticPotential(); // This will trigger the main calculate()
+                showNotification(`Project "${project.name}" loaded successfully!`);
+            } else {
+                showNotification('No saved project found in local storage.', true);
+            }
+        }
+        
+        // --- MARKET PRICE SIMULATION ---
+        async function fetchMarketPrices() {
+            const btn = document.getElementById('fetchPriceBtn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `
+                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>`;
+            btn.disabled = true;
+
+            try {
+                // This is a simulation of a real API call.
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Mocking the data structure from the example API response
+                const minPrice = 500;
+                const maxPrice = 620;
+                const data = {
+                    averagePrice: Math.floor(Math.random() * (maxPrice - minPrice + 1)) + minPrice
+                };
+                
+                document.getElementById('salePricePerKg').value = data.averagePrice;
+                
+                calculate();
+                showNotification(`Market price updated to BDT ${data.averagePrice}/Kg.`);
+
+            } catch (error) {
+                console.error('Market Price Fetch Error:', error.message);
+                showNotification('Failed to fetch market price. Using default value.', true);
+            } finally {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        }
+
+
+        // --- SCENARIO & RISK FUNCTIONS ---
+        function calculateRisk() {
+            const disease = getVal('diseaseRisk');
+            const feed = getVal('feedVolatility');
+            const price = getVal('priceDropRisk');
+            // Weighted score: disease is high impact, feed/price volatility are medium.
+            const score = (disease * 0.5) + (feed * 0.3) + (price * 0.2);
+            let level = '';
+            let colorClass = '';
+
+            if (score < 8) {
+                level = 'Low'; colorClass = 'text-green-600';
+            } else if (score < 15) {
+                level = 'Medium'; colorClass = 'text-yellow-600';
+            } else if (score < 25) {
+                level = 'High'; colorClass = 'text-orange-600';
+            } else {
+                level = 'Very High'; colorClass = 'text-red-600';
+            }
+            setHTML('risk-output', `Overall Risk Level: <span class="${colorClass}">${level}</span>`);
+        }
+
+        function runScenario(scenario) {
+            activeScenario = scenario;
+            
+            // 1. Restore all inputs to the user's last saved "base" values
+            Object.keys(baseValues).forEach(key => {
+                 if (document.getElementById(key)) {
+                    document.getElementById(key).value = baseValues[key];
+                 }
+            });
+            if (baseValues['activeFodder']) {
+                activeFodder = baseValues['activeFodder'];
+                document.querySelectorAll('#fodder-type-selector .fodder-btn').forEach(btn => {
+                   btn.classList.toggle('active', btn.dataset.fodder === activeFodder);
+                });
+                document.getElementById('custom-fodder-yield-wrapper').classList.toggle('hidden', activeFodder !== 'custom');
+            }
+
+
+            // 2. If the scenario is not 'base', apply multipliers
+            if (scenario !== 'base') {
+                const scenarioMultipliers = {
+                    best: { sale: 1.10, feed: 0.95, kidding: 1.10 },
+                    worst: { sale: 0.85, feed: 1.20, kidding: 0.90 }
+                };
+                const multipliers = scenarioMultipliers[scenario];
+
+                if (multipliers) {
+                    const inputsToChange = {
+                        'salePricePerKg': multipliers.sale,
+                        'kiddingRate': multipliers.kidding,
+                        'concentratePrice': multipliers.feed,
+                        'greenRoughagePrice': multipliers.feed,
+                        'dryRoughagePrice': multipliers.feed
+                    };
+
+                    for (const id in inputsToChange) {
+                        const input = document.getElementById(id);
+                        const baseVal = parseFloat(baseValues[id]) || 0;
+                        input.value = (baseVal * inputsToChange[id]).toFixed(2);
+                    }
+                }
+            }
+            
+            // 3. Update button styles
+            document.querySelectorAll('#scenario-buttons .scenario-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[onclick="runScenario('${scenario}')"]`).classList.add('active');
+
+            // 4. Recalculate the entire report
+            calculateGeneticPotential();
+        }
+
+
+        // --- CORE CALCULATION (Annual Breeding Model) ---
+        function calculate() {
+            // If the user is just typing, it's the base scenario. So capture their inputs.
+            if (activeScenario === 'base') {
+                captureBaseValues();
+            }
+
+            let fodderYieldValue;
+            if (activeFodder === 'napier') {
+                fodderYieldValue = 40000; // 40 tonnes
+            } else if (activeFodder === 'maize') {
+                fodderYieldValue = 15000; // 15 tonnes
+            } else if (activeFodder === 'jackfruit') {
+                fodderYieldValue = 15000; // 15 tonnes (as fodder bank)
+            } else {
+                fodderYieldValue = getVal('fodderYield');
+            }
+
+            const inputs = {
+                totalDoes: getVal('totalDoes'),
+                totalBucks: getVal('totalBucks'),
+                kiddingInterval: getVal('kiddingInterval'),
+                kiddingRate: getVal('kiddingRate'),
+                kidMortalityRate: getVal('kidMortalityRate') / 100,
+                doeMortalityRate: getVal('doeMortalityRate') / 100,
+                cullRate: getVal('cullRate') / 100,
+                saleAgeKids: getVal('saleAgeKids'),
+                saleWeightKids: getVal('saleWeightKids'),
+                
+                landCostPerAcre: getVal('landCostPerAcre'),
+                fodderYield: fodderYieldValue,
+                activeFodder: activeFodder,
+                buildingCost: getVal('buildingCost'),
+                equipmentPrice: getVal('equipmentPrice'),
+                doePrice: getVal('doePrice'),
+                buckPrice: getVal('buckPrice'),
+                
+                concentratePrice: getVal('concentratePrice'),
+                greenRoughagePrice: getVal('greenRoughagePrice'),
+                dryRoughagePrice: getVal('dryRoughagePrice'),
+                feed: {
+                    conc: getVal('feed_conc'),
+                    green: getVal('feed_green'),
+                    dry: getVal('feed_dry')
+                },
+                
+                laborSalary: getVal('laborSalary'),
+                vetCostPerGoat: getVal('vetCostPerGoat'),
+                otherCosts: getVal('otherCosts'),
+                
+                salePricePerKg: getVal('salePricePerKg'),
+                cullPrice: getVal('cullPrice'),
+                manureIncome: getVal('manureIncome'),
+                
+                ownInvestment: getVal('ownInvestment'),
+                bankLoan: getVal('bankLoan'),
+                interestRate: getVal('interestRate') / 100,
+                loanTerm: getVal('loanTerm'),
+                depreciationRate: getVal('depreciationRate') / 100,
+                
+                breed: document.getElementById('breedSelection').value,
+                geneticsScore: getVal('geneticsScore'),
+            };
+
+            // --- Herd Dynamics (Steady-State Model) ---
+            const geneticFactors = calculateGeneticPotential(false); // get factors without UI update
+            const effectiveKiddingRate = inputs.kiddingRate * geneticFactors.kiddingRate;
+            const kiddingsPerYear = inputs.kiddingInterval > 0 ? 12 / inputs.kiddingInterval : 0;
+            
+            // Calculate production based on average does alive during the year
+            const avgProducingDoes = inputs.totalDoes * (1 - inputs.doeMortalityRate / 2); 
+            const totalKidsBorn = avgProducingDoes * kiddingsPerYear * effectiveKiddingRate;
+            const totalKidsSurviving = totalKidsBorn * (1 - inputs.kidMortalityRate);
+            
+            // Calculate replacements needed to keep herd size constant
+            const doesDie = inputs.totalDoes * inputs.doeMortalityRate;
+            const doesToCull = inputs.totalDoes * inputs.cullRate; // Cull from the starting herd
+            const totalDoesRemoved = doesDie + doesToCull;
+            const kidsForReplacement = totalDoesRemoved; 
+            
+            const kidsToSell = totalKidsSurviving - kidsForReplacement;
+            
+            const bucksToCull = inputs.totalBucks * 0.25; // Assuming bucks are replaced every 4 years
+
+            // Calculate average herd size for feed calculation
+            // (Constant Adults) + (Kids growing for X months)
+            const adultEquivalents = inputs.totalDoes + inputs.totalBucks; // Based on constant adult herd
+            const kidEquivalents = totalKidsSurviving * (inputs.saleAgeKids / 12); // Kids present for part of the year
+            const totalFeedableUnits = adultEquivalents + kidEquivalents;
+            
+            setHTML('kiddingsPerYear', kiddingsPerYear.toFixed(1));
+            setHTML('totalKidsBorn', Math.floor(totalKidsBorn));
+            setHTML('totalKidsSurviving', Math.floor(totalKidsSurviving));
+            setHTML('totalKidsSold', Math.floor(kidsToSell));
+
+            // --- Capital Costs ---
+            const laborers = Math.ceil(inputs.totalDoes / 50); // 1 laborer per 50 does
+            const landSqMetersPerDoe = 1.49; // Updated: 16 sq ft is approx 1.49 sq meters
+            const sqMetersToAcres = 4046.86;
+            const requiredLandAcres = (inputs.totalDoes * landSqMetersPerDoe) / sqMetersToAcres;
+
+            const dailyFodderPerUnit = inputs.feed.green + inputs.feed.dry;
+            const annualFodderRequirement = totalFeedableUnits * dailyFodderPerUnit * 365;
+            const requiredFodderLandAcres = inputs.fodderYield > 0 ? annualFodderRequirement / inputs.fodderYield : 0;
+            const totalAnnualProduction = requiredFodderLandAcres * inputs.fodderYield;
+            
+            const landData = {
+                housing: requiredLandAcres,
+                fodder: requiredFodderLandAcres
+            };
+
+            const calculatedLandCost = (requiredLandAcres + requiredFodderLandAcres) * inputs.landCostPerAcre;
+            const totalLivestockCost = (inputs.totalDoes * inputs.doePrice) + (inputs.totalBucks * inputs.buckPrice);
+            
+            const capital = {
+                land: calculatedLandCost,
+                buildings: inputs.buildingCost,
+                equipment: inputs.equipmentPrice,
+                livestock: totalLivestockCost,
+                totalFixed: calculatedLandCost + inputs.buildingCost + inputs.equipmentPrice
+            };
+            const totalInitialInvestment = capital.totalFixed + capital.livestock;
+
+            setHTML('landRequirement', requiredLandAcres.toFixed(2));
+            setHTML('fodderLandRequirement', requiredFodderLandAcres.toFixed(2));
+            setHTML('annualFodderProduction', `${(totalAnnualProduction / 1000).toFixed(2)} Tonnes`);
+            setHTML('laborerCount', laborers);
+            setHTML('capital-summary', `<div class="p-3 bg-gray-100 rounded-lg text-center"><h4 class="font-semibold">Total Initial Investment</h4><p class="text-xl font-bold text-gray-800">${formatCurrency(totalInitialInvestment)}</p></div>`);
+
+            // --- Annual Income ---
+            const effectiveSalePrice = inputs.salePricePerKg * (1 + geneticFactors.premium);
+            const income = {
+                kidSale: kidsToSell * inputs.saleWeightKids * effectiveSalePrice,
+                cullSale: (doesToCull + bucksToCull) * inputs.cullPrice,
+                manure: inputs.manureIncome,
+            };
+            income.total = income.kidSale + income.cullSale + income.manure;
+
+            // --- Annual Expenses ---
+            const dailyFeedCostPerUnit = (inputs.feed.conc * inputs.concentratePrice) + (inputs.feed.green * inputs.greenRoughagePrice) + (inputs.feed.dry * inputs.dryRoughagePrice);
+            const annualFeedCost = totalFeedableUnits * dailyFeedCostPerUnit * 365 * geneticFactors.feedEfficiency;
+            const annualLaborCost = laborers * inputs.laborSalary * 12;
+            const annualVetCost = (adultEquivalents + totalKidsSurviving) * inputs.vetCostPerGoat; // Vet cost for all animals
+
+            const expenses = {
+                feed: annualFeedCost,
+                labor: annualLaborCost,
+                vet: annualVetCost,
+                other: inputs.otherCosts,
+                interest: inputs.bankLoan * inputs.interestRate,
+                depreciation: capital.totalFixed * inputs.depreciationRate,
+            };
+            expenses.total = expenses.feed + expenses.labor + expenses.vet + expenses.other + expenses.interest + expenses.depreciation;
+            
+            const annualNetProfit = income.total - expenses.total;
+
+            // --- Funding Summary ---
+            const totalFunding = inputs.ownInvestment + inputs.bankLoan;
+            const fundingDifference = totalFunding - totalInitialInvestment;
+
+            let fundingStatusHTML = '';
+            if (fundingDifference < 0) {
+                fundingStatusHTML = `<p class="text-sm font-semibold loss">Funding Shortfall: ${formatCurrency(Math.abs(fundingDifference))}</p>`;
+            } else if (fundingDifference > 0) {
+                fundingStatusHTML = `<p class="text-sm font-semibold text-blue-600">Funding Surplus: ${formatCurrency(fundingDifference)}</p>`;
+            } else {
+                fundingStatusHTML = `<p class="text-sm font-semibold profit">Funding Balanced</p>`;
+            }
+
+            setHTML('funding-summary', `
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">Total Investment Required:</span>
+                    <span class="font-bold">${formatCurrency(totalInitialInvestment)}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="font-medium">Total Funding (Own + Loan):</span>
+                    <span class="font-bold">${formatCurrency(totalFunding)}</span>
+                </div>
+                <div class="text-center mt-2">${fundingStatusHTML}</div>
+            `);
+            
+            reportData = { inputs, capital, income, expenses, annualNetProfit, land: landData, herd: { kidsToSell, doesToCull, bucksToCull, totalFeedableUnits, doesDie, kidsForReplacement, totalKidsSurviving } };
+            
+            // Render Report
+            renderReport();
+            calculateSustainability();
+        }
+
+        function renderReport() {
+            const { annualNetProfit, income, expenses } = reportData;
+            const profitLossClass = annualNetProfit >= 0 ? 'profit' : 'loss';
+
+            setHTML('report-summary', `
+                <div class="space-y-2 text-sm mb-4">
+                    <div class="flex justify-between p-2 bg-gray-50 rounded"><span>Total Annual Income:</span><span class="font-bold">${formatCurrency(income.total)}</span></div>
+                    <div class="flex justify-between p-2"><span>Total Annual Expenses:</span><span class="font-bold">${formatCurrency(expenses.total)}</span></div>
+                    <div class="flex justify-between p-3 rounded text-lg ${annualNetProfit > 0 ? 'bg-green-100' : 'bg-red-100'}">
+                        <span class="font-bold ${profitLossClass}">Annual Net Profit:</span>
+                        <span class="font-bold ${profitLossClass}">${formatCurrency(annualNetProfit)}</span>
+                    </div>
+                </div>`);
+
+            setHTML('report-container', `
+                <table class="report-table text-sm">
+                    <tr class="sub-header"><td colspan="2">Annual Income Breakdown</td></tr>
+                    <tr><td>Sale of Kids</td><td class="text-right">${formatCurrency(income.kidSale)}</td></tr>
+                    <tr><td>Sale of Cull Animals</td><td class="text-right">${formatCurrency(income.cullSale)}</td></tr>
+                    <tr><td>Manure & Other</td><td class="text-right">${formatCurrency(income.manure)}</td></tr>
+                    <tr class="total-row"><td>Total Annual Income</td><td class="text-right">${formatCurrency(income.total)}</td></tr>
+                    <tr class="sub-header"><td colspan="2">Annual Expense Breakdown</td></tr>
+                    <tr><td>Feed Cost</td><td class="text-right">${formatCurrency(expenses.feed)}</td></tr>
+                    <tr><td>Labor</td><td class="text-right">${formatCurrency(expenses.labor)}</td></tr>
+                    <tr><td>Vet & Medicine</td><td class="text-right">${formatCurrency(expenses.vet)}</td></tr>
+                    <tr><td>Depreciation & Interest</td><td class="text-right">${formatCurrency(expenses.depreciation + expenses.interest)}</td></tr>
+                    <tr><td>Other Costs</td><td class="text-right">${formatCurrency(expenses.other)}</td></tr>
+                    <tr class="total-row"><td>Total Annual Expenses</td><td class="text-right">${formatCurrency(expenses.total)}</td></tr>
+                </table>`);
+        }
+        
+        // --- MODALS & UI FUNCTIONS ---
+        function showGuide() {
+            setHTML('guideContent', `
+                <h3>1. Initial Setup & Housing</h3>
+                <p>A successful goat farm starts with secure housing. Goats are natural browsers and climbers, so sturdy fencing is more important than for cattle.</p>
+                <ul>
+                    <li><strong>Space:</strong> Allocate at least 16 sq ft (approx 1.5 square meters) of shed space per adult doe. This planner estimates land for this.</li>
+                    <li><strong>Flooring:</strong> Raised, slatted floors (wooden or plastic) are ideal for hygiene, reducing foot rot and parasite load. Concrete is acceptable but requires more cleaning.</li>
+                    <li><strong>Fencing:</strong> Use strong, 4-5 foot high woven wire or electric fencing. Goats are known escape artists.</li>
+                    <li><strong>Ventilation:</strong> Ensure good airflow to reduce humidity and respiratory issues.</li>
+                </ul>
+                
+                <h3>2. Breed Selection</h3>
+                <p>The breed you choose will define your farm's output. For meat production in Bangladesh, prolificacy and hardiness are key.</p>
+                <ul>
+                    <li><strong>Black Bengal:</strong> Famous for high prolificacy (kidding rate) and excellent meat quality. They are small but highly adapted.</li>
+                    <li><strong>Jamunapari / Barbari:</strong> Larger breeds, often used for both meat and milk. May have lower kidding rates but higher sale weights.</li>
+                    <li><strong>Boer Cross:</strong> A Boer buck crossed with local does (like Black Bengal) produces fast-growing kids with excellent meat conformation. This is a very popular commercial strategy.</li>
+                </ul>
+
+                <h3>3. Health & Biosecurity</h3>
+                <p>Goats are hardy but susceptible to internal parasites (worms) and specific diseases. A strict health program is essential.</p>
+                <ul>
+                    <li><strong>Quarantine:</strong> Isolate new animals for at least 3-4 weeks.</li>
+                    <li><strong>Vaccination:</strong> Vaccinate against PPR (Peste des Petits Ruminants), Goat Pox, and FMD (Foot and Mouth Disease).</li>
+                    <li><strong>Deworming:</strong> This is CRITICAL. Goats have low resistance to worms. Implement a regular deworming schedule (e.g., every 3-4 months) and rotate dewormers to prevent resistance.</li>
+                    <li><strong>Hoof Trimming:</strong> Regularly trim hooves (every 2-3 months) to prevent foot rot.</li>
+                </ul>
+
+                <h3>4. Feeding Management</h3>
+                <p>Feed is the largest operational cost. Goats are "browsers," meaning they prefer to eat leaves, bushes, and higher-quality grasses, unlike "grazers" (cattle).</p>
+                <ul>
+                    <li><strong>Ration:</strong> A good ration includes high-quality green roughage (Napier, Maize, Jackfruit leaves, Ipil-ipil), dry roughage (rice straw), and a concentrate mix (maize, bran, soybean meal) especially for pregnant/lactating does and growing kids.</li>
+                    <li><strong>Water:</strong> Provide clean, fresh water at all times.</li>
+                    <li><strong>Minerals:</strong> A mineral salt block is essential for goat health.</li>
+                </ul>
+                
+                <h3>5. Breeding Management</h3>
+                <p>Your profit is driven by successful breeding.</p>
+                <ul>
+                    <li><strong>Buck Ratio:</strong> One healthy buck can service 20-25 does. Rotate bucks or bring in new bloodlines every 2-3 years to prevent inbreeding.</li>
+                    <li><strong>Kidding:</strong> Provide a clean, dry, and safe "kidding pen" for does about to give birth.</li>
+                    <li><strong>Kid Care:</strong> Ensure kids receive colostrum (first milk) within the first few hours of birth. Disinfect the umbilical cord with iodine.</li>
+                    <li><strong>Culling:</strong> Be strict. Cull (sell) does that are old, have poor kidding records, or are frequently sick. This improves your herd's overall genetic quality and profitability.</li>
+                </ul>
+            `);
+            openModal('guideModal');
+        }
+
+        function showKPIs() {
+            if (!reportData.inputs) return;
+            const { inputs, annualNetProfit, expenses, income, capital, herd } = reportData;
+            
+            const profitPerDoe = annualNetProfit / inputs.totalDoes;
+            const totalInitialInvestment = capital.totalFixed + capital.livestock;
+            const roi = (annualNetProfit / totalInitialInvestment) * 100; // ROI on capital
+            
+            // FCR for Kids
+            const totalFeedForKids = (herd.totalFeedableUnits - (inputs.totalDoes + inputs.totalBucks)) * (inputs.feed.conc * inputs.concentratePrice + inputs.feed.green * inputs.greenRoughagePrice + inputs.feed.dry * inputs.dryRoughagePrice) * 365;
+            const totalWeightGainedKids = herd.kidsToSell * inputs.saleWeightKids;
+            const fcr = totalWeightGainedKids > 0 ? (totalFeedForKids / expenses.feed) * expenses.feed / totalWeightGainedKids : 0; // This is a rough proxy
+
+            const breakEvenSalePrice = (expenses.total - income.cullSale - income.manure) / (herd.kidsToSell * inputs.saleWeightKids);
+
+
+            setHTML('kpiContent', `
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div class="p-4 bg-green-50 rounded-lg"><p class="text-2xl font-bold">${formatCurrency(profitPerDoe)}</p><p class="text-sm text-gray-600">Annual Net Profit / Doe</p></div>
+                    <div class="p-4 bg-blue-50 rounded-lg"><p class="text-2xl font-bold">${roi.toFixed(2)}%</p><p class="text-sm text-gray-600">Return on Investment (ROI)</p></div>
+                    <div class="p-4 bg-yellow-50 rounded-lg">
+                        <p class="text-2xl font-bold tooltip">${(herd.kidsToSell / inputs.totalDoes).toFixed(2)}
+                           <span class="tooltiptext">Number of kids sold per doe in the herd, per year.</span>
+                        </p>
+                        <p class="text-sm text-gray-600">Kids Sold / Doe / Year</p>
+                    </div>
+                    <div class="p-4 bg-indigo-50 rounded-lg">
+                        <p class="text-2xl font-bold tooltip">${formatCurrency(breakEvenSalePrice)}/Kg
+                           <span class="tooltiptext">The minimum price you must sell kids for to cover all annual costs.</span>
+                        </p>
+                        <p class="text-sm text-gray-600">Break-Even Sale Price (Kids)</p>
+                    </div>
+                </div>`);
+            openModal('kpiModal');
+        }
+        
+        function showSteadyStateLogic() {
+            if (!reportData.herd) {
+                showNotification('Please calculate a report first.', true);
+                return;
+            }
+            const { inputs, herd } = reportData;
+            
+            const totalDoesRemoved = herd.doesDie + herd.doesToCull;
+
+            setHTML('steadyStateContent', `
+                <p class="text-gray-600 mb-4">A "steady-state" herd model assumes the number of adult does remains constant. This is achieved by replacing all does that are culled or die with an equal number of young females (replacements) born on the farm.</p>
+                
+                <h3 class="sub-section-title">1. Annual Doe Removal</h3>
+                <div class="p-4 bg-red-50 rounded-lg text-sm space-y-2">
+                    <div class="flex justify-between"><span>Starting Does:</span> <span class="font-bold">${inputs.totalDoes}</span></div>
+                    <div class="flex justify-between border-t pt-2"><span>Does Culled (${(inputs.cullRate * 100).toFixed(0)}%):</span> <span class="font-bold">${herd.doesToCull.toFixed(1)}</span></div>
+                    <div class="flex justify-between"><span>Does Die (${(inputs.doeMortalityRate * 100).toFixed(0)}%):</span> <span class="font-bold">${herd.doesDie.toFixed(1)}</span></div>
+                    <div class="flex justify-between border-t pt-2 font-bold text-red-700"><span>Total Does to Replace:</span> <span>${totalDoesRemoved.toFixed(1)}</span></div>
+                </div>
+
+                <h3 class="sub-section-title mt-4">2. Kid Production & Allocation</h3>
+                <div class="p-4 bg-green-50 rounded-lg text-sm space-y-2">
+                    <div class="flex justify-between"><span>Total Surviving Kids Born:</span> <span class="font-bold">${herd.totalKidsSurviving.toFixed(1)}</span></div>
+                    <div class="flex justify-between border-t pt-2">
+                        <span class="text-red-700">(-) Kids Kept for Replacement:</span> 
+                        <span class="font-bold text-red-700">${herd.kidsForReplacement.toFixed(1)}</span>
+                    </div>
+                    <div class="flex justify-between border-t pt-2 font-bold text-green-700">
+                        <span>(=) Kids Available for Sale:</span> 
+                        <span>${herd.kidsToSell.toFixed(1)}</span>
+                    </div>
+                </div>
+                
+                <p class="text-xs text-gray-500 mt-4 text-center">This model ensures your herd size of <strong>${inputs.totalDoes} does</strong> is maintained every year.</p>
+            `);
+            openModal('steadyStateModal');
+        }
+
+        function showBreakEven() {
+            if (!reportData.inputs) return;
+            const { inputs, expenses, income, herd } = reportData;
+
+            // 1. Break-Even Sale Price (per Kg of Kid)
+            const totalSaleableWeight = herd.kidsToSell * inputs.saleWeightKids;
+            const costsToCoverByKids = expenses.total - income.cullSale - income.manure;
+            const breakEvenPrice = totalSaleableWeight > 0 ? costsToCoverByKids / totalSaleableWeight : 0;
+
+            // 2. Break-Even Number of Does
+            const fixedCosts = expenses.labor + expenses.other + expenses.interest + expenses.depreciation;
+            
+            // Calculate revenue and variable costs per doe
+            const kiddingsPerYear = inputs.kiddingInterval > 0 ? 12 / inputs.kiddingInterval : 0;
+            const effectiveKiddingRate = inputs.kiddingRate * calculateGeneticPotential(false).kiddingRate;
+            const kidsSoldPerDoe = (kiddingsPerYear * effectiveKiddingRate * (1 - inputs.kidMortalityRate)) - (inputs.cullRate);
+            
+            const revenuePerDoe = (kidsSoldPerDoe * inputs.saleWeightKids * inputs.salePricePerKg) + (inputs.cullRate * inputs.cullPrice);
+            
+            const dailyFeedCostPerUnit = (inputs.feed.conc * inputs.concentratePrice) + (inputs.feed.green * inputs.greenRoughagePrice) + (inputs.feed.dry * inputs.dryRoughagePrice);
+            // Feedable units per doe: 1 (doe) + (kidsSoldPerDoe * saleAge/12)
+            const feedableUnitsPerDoe = 1 + (kidsSoldPerDoe * (inputs.saleAgeKids / 12));
+            const variableFeedCostPerDoe = feedableUnitsPerDoe * dailyFeedCostPerUnit * 365;
+            const variableVetCostPerDoe = (1 + kidsSoldPerDoe) * inputs.vetCostPerGoat;
+            
+            const variableCostPerDoe = variableFeedCostPerDoe + variableVetCostPerDoe;
+            
+            const contributionMarginPerDoe = revenuePerDoe - variableCostPerDoe;
+            
+            // Adjust fixed costs by other income sources
+            const netFixedCosts = fixedCosts - income.manure; // Assuming manure is "fixed"
+            const breakEvenDoes = contributionMarginPerDoe > 0 ? netFixedCosts / contributionMarginPerDoe : Infinity;
+
+
+            setHTML('breakEvenContent', `
+                <p class="text-gray-600 mb-4">This analysis determines the point at which your annual revenue equals your annual costs.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                    <div class="p-4 bg-teal-50 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-1">Break-Even Sale Price (Kids)</p>
+                        <p class="text-2xl font-bold text-teal-800">${formatCurrency(breakEvenPrice)} / Kg</p>
+                        <p class="text-xs text-gray-500 mt-2">The minimum price you must sell each Kg of kid meat for to cover all annual costs (after cull income).</p>
+                    </div>
+                    <div class="p-4 bg-orange-50 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-1">Break-Even Herd Size (Does)</p>
+                        <p class="text-2xl font-bold text-orange-800">${isFinite(breakEvenDoes) ? Math.ceil(breakEvenDoes) : 'N/A'}</p>
+                        <p class="text-xs text-gray-500 mt-2">The number of does you must keep to cover all fixed costs at current prices.</p>
+                    </div>
+                </div>
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg text-sm">
+                    <h4 class="font-semibold mb-2">Calculation Breakdown (Per Doe):</h4>
+                    <div class="flex justify-between border-b py-1"><span>Annual Revenue / Doe:</span><span class="font-medium">${formatCurrency(revenuePerDoe)}</span></div>
+                    <div class="flex justify-between border-b py-1"><span>Annual Variable Cost / Doe:</span><span class="font-medium">${formatCurrency(variableCostPerDoe)}</span></div>
+                    <div class="flex justify-between py-1"><span>Contribution Margin / Doe:</span><span class="font-medium">${formatCurrency(contributionMarginPerDoe)}</span></div>
+                </div>
+            `);
+            openModal('breakEvenModal');
+        }
+
+        function show5YearProjections() {
+            if (!reportData.inputs) return;
+            
+            let html = `<p class="text-gray-600 mb-4">A simple 5-year projection assuming stable costs, prices, and herd size. This shows the cumulative profit and the impact of paying down loan principal.</p>
+                        <div class="max-h-96 overflow-y-auto">
+                        <table class="report-table text-sm">
+                        <thead><tr><th>Year</th><th>Total Income</th><th>Total Expenses</th><th>Net Profit</th><th>Cumulative Profit</th><th>Loan Balance</th></tr></thead>
+                        <tbody>`;
+
+            let cumulativeProfit = 0;
+            let loanBalance = reportData.inputs.bankLoan;
+            const monthlyRate = reportData.inputs.interestRate / 12;
+            const loanTerm = reportData.inputs.loanTerm;
+            const monthlyPayment = monthlyRate > 0 ? (loanBalance * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -loanTerm * 12)) : (loanTerm > 0 ? loanBalance / (loanTerm * 12) : 0);
+            const annualLoanPayment = monthlyPayment * 12;
+
+            for (let y = 1; y <= 5; y++) {
+                const { income, expenses } = reportData; // Base data
+                let annualInterest = 0;
+                let annualPrincipal = 0;
+
+                if (y <= loanTerm && loanBalance > 0) {
+                     for (let m = 0; m < 12; m++) {
+                        let interest = loanBalance * monthlyRate;
+                        let principal = monthlyPayment - interest;
+                        loanBalance -= principal;
+                        annualInterest += interest;
+                        annualPrincipal += principal;
+                    }
+                     if (loanBalance < 1) loanBalance = 0;
+                } else {
+                    // After loan term, no interest
+                    annualInterest = 0;
+                }
+                
+                // Recalculate expenses with new interest
+                let currentExpenses = expenses.total - expenses.interest + annualInterest;
+                let currentNetProfit = income.total - currentExpenses;
+                cumulativeProfit += currentNetProfit;
+
+                html += `<tr>
+                            <td>${y}</td>
+                            <td>${formatCurrency(income.total)}</td>
+                            <td>${formatCurrency(currentExpenses)}</td>
+                            <td class="${currentNetProfit >= 0 ? 'profit' : 'loss'}">${formatCurrency(currentNetProfit)}</td>
+                            <td class="${cumulativeProfit >= 0 ? 'profit' : 'loss'}">${formatCurrency(cumulativeProfit)}</td>
+                            <td>${formatCurrency(loanBalance)}</td>
+                         </tr>`;
+            }
+
+            html += `</tbody></table></div>`;
+            setHTML('projection5YearContent', html);
+            openModal('projection5YearModal');
+        }
+        
+        function showLoanRepayment() {
+            if (!reportData.inputs) {
+                showNotification('Please calculate a report first.', true);
+                return;
+            }
+            const { inputs, annualNetProfit, expenses } = reportData;
+            const { bankLoan, interestRate, loanTerm } = inputs;
+
+            // Calculate Loan Installment
+            const monthlyRate = interestRate / 12;
+            const monthlyPayment = (loanTerm > 0 && monthlyRate > 0) ? (bankLoan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -loanTerm * 12)) : (loanTerm > 0 ? bankLoan / (loanTerm * 12) : 0);
+            const annualLoanInstallment = monthlyPayment * 12;
+
+            const remainingBalance = annualNetProfit - annualLoanInstallment;
+            
+            // DSCR Calculation
+            const netOperatingIncome = annualNetProfit + expenses.interest + expenses.depreciation;
+            const dscr = annualLoanInstallment > 0 ? netOperatingIncome / annualLoanInstallment : Infinity;
+            
+            const dscrClass = dscr >= 1.25 ? 'profit' : 'loss';
+
+            setHTML('loanRepaymentContent', `
+                <p class="text-gray-600 mb-4">This analysis shows the project's capacity to cover its annual loan obligations based on the projected annual profit.</p>
+                <table class="report-table text-sm">
+                    <tr>
+                        <td class="font-semibold">Projected Annual Net Profit</td>
+                        <td class="text-right font-bold ${annualNetProfit >= 0 ? 'profit' : 'loss'}">${formatCurrency(annualNetProfit)}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Annual Loan Installment (Principal + Interest)</td>
+                        <td class="text-right">${formatCurrency(annualLoanInstallment)}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td class="font-semibold">Remaining Balance After Loan Payment</td>
+                        <td class="text-right ${remainingBalance >= 0 ? 'profit' : 'loss'}">${formatCurrency(remainingBalance)}</td>
+                    </tr>
+                </table>
+                <div class="mt-6 p-4 bg-blue-50 rounded-lg text-center">
+                    <p class="font-semibold text-blue-800 tooltip">Debt Service Coverage Ratio (DSCR)
+                         <span class="tooltiptext">DSCR = (Net Operating Income) / (Total Debt Service). A ratio above 1.25 is generally considered healthy by lenders.</span>
+                    </p>
+                    <p class="text-3xl font-bold ${dscrClass}">${isFinite(dscr) ? dscr.toFixed(2) : 'N/A'}</p>
+                </div>
+            `);
+            openModal('loanRepaymentModal');
+        }
+
+        function showAmortization() {
+             const { bankLoan, interestRate, loanTerm } = reportData.inputs;
+             if (bankLoan <= 0 || loanTerm <= 0) {
+                 document.getElementById('amortizationContent').innerHTML = '<p class="text-center text-red-500">Please enter a valid Bank Loan amount and Term.</p>';
+             } else {
+                 let balance = bankLoan;
+                 const monthlyRate = interestRate / 12;
+                 const monthlyPayment = monthlyRate > 0 ? (bankLoan * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -loanTerm * 12)) : bankLoan / (loanTerm * 12);
+
+                 let html = `<p class="mb-2 text-center"><strong>Monthly Payment:</strong> ${formatCurrency(monthlyPayment)}</p>
+                    <div class="max-h-96 overflow-y-auto"><table class="report-table w-full text-sm"><thead><tr><th>Year</th><th>Beginning Balance</th><th>Total Payments</th><th>Principal Paid</th><th>Interest Paid</th><th>Ending Balance</th></tr></thead><tbody>`;
+                 for (let y = 1; y <= loanTerm; y++) {
+                     let yearStart = balance; let yearlyInterest = 0; let yearlyPrincipal = 0;
+                     for (let m = 1; m <= 12; m++) {
+                         const i = balance * monthlyRate; const p = monthlyPayment - i;
+                         balance -= p; yearlyInterest += i; yearlyPrincipal += p;
+                     }
+                     html += `<tr><td>${y}</td><td>${formatCurrency(yearStart)}</td><td>${formatCurrency(monthlyPayment*12)}</td><td>${formatCurrency(yearlyPrincipal)}</td><td>${formatCurrency(yearlyInterest)}</td><td>${formatCurrency(balance < 1 ? 0 : balance)}</td></tr>`;
+                 }
+                 html += `</tbody></table></div>`;
+                 document.getElementById('amortizationContent').innerHTML = html;
+             }
+             openModal('amortizationModal');
+        }
+        
+        function showSensitivity() {
+            if (!reportData.annualNetProfit) return;
+            
+            // Need to run simulations, as this is a complex non-linear system
+            const baseProfit = reportData.annualNetProfit;
+            const baseInputs = JSON.parse(JSON.stringify(reportData.inputs));
+
+            // 1. Sale Price
+            let inputsSaleUp = JSON.parse(JSON.stringify(baseInputs));
+            inputsSaleUp.salePricePerKg *= 1.10;
+            const salePriceUpProfit = calculateProfitForSimulation(inputsSaleUp);
+            
+            let inputsSaleDown = JSON.parse(JSON.stringify(baseInputs));
+            inputsSaleDown.salePricePerKg *= 0.90;
+            const salePriceDownProfit = calculateProfitForSimulation(inputsSaleDown);
+
+            // 2. Feed Cost
+            let inputsFeedUp = JSON.parse(JSON.stringify(baseInputs));
+            inputsFeedUp.concentratePrice *= 1.10;
+            inputsFeedUp.greenRoughagePrice *= 1.10;
+            inputsFeedUp.dryRoughagePrice *= 1.10;
+            const feedCostUpProfit = calculateProfitForSimulation(inputsFeedUp);
+            
+            let inputsFeedDown = JSON.parse(JSON.stringify(baseInputs));
+            inputsFeedDown.concentratePrice *= 0.90;
+            inputsFeedDown.greenRoughagePrice *= 0.90;
+            inputsFeedDown.dryRoughagePrice *= 0.90;
+            const feedCostDownProfit = calculateProfitForSimulation(inputsFeedDown);
+            
+            // 3. Kidding Rate
+            let inputsKiddingUp = JSON.parse(JSON.stringify(baseInputs));
+            inputsKiddingUp.kiddingRate *= 1.10;
+            const kiddingUpProfit = calculateProfitForSimulation(inputsKiddingUp);
+            
+            let inputsKiddingDown = JSON.parse(JSON.stringify(baseInputs));
+            inputsKiddingDown.kiddingRate *= 0.90;
+            const kiddingDownProfit = calculateProfitForSimulation(inputsKiddingDown);
+
+            const createRow = (variable, direction, value) => {
+                const change = value - baseProfit;
+                const changeClass = change >= 0 ? 'profit' : 'loss';
+                return `<tr><td>${variable}</td><td>${direction}</td><td>${formatCurrency(value)}</td><td class="${changeClass}">${formatCurrency(change)}</td></tr>`;
+            };
+
+            let html = `<table class="report-table w-full text-sm">
+                <thead><tr><th>Variable</th><th>Change</th><th>New Net Profit</th><th>Impact</th></tr></thead>
+                <tbody>
+                    <tr><td colspan="4" class="sub-header">Base Annual Net Profit: ${formatCurrency(baseProfit)}</td></tr>
+                    ${createRow('Sale Price/Kg', '+10%', salePriceUpProfit)}
+                    ${createRow('Sale Price/Kg', '-10%', salePriceDownProfit)}
+                    ${createRow('Feed Cost', '+10%', feedCostUpProfit)}
+                    ${createRow('Feed Cost', '-10%', feedCostDownProfit)}
+                    ${createRow('Kidding Rate', '+10%', kiddingUpProfit)}
+                    ${createRow('Kidding Rate', '-10%', kiddingDownProfit)}
+                </tbody></table>`;
+            document.getElementById('sensitivityContent').innerHTML = html;
+            openModal('sensitivityModal');
+        }
+
+        function showVisualization() {
+            if (!reportData.expenses) return;
+            const { feed, labor, vet, other, depreciation, interest } = reportData.expenses;
+            const ctx = document.getElementById('financialChart').getContext('2d');
+            if (financialChartInstance) financialChartInstance.destroy();
+            financialChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Feed', 'Labor', 'Vet & Medicine', 'Depreciation', 'Interest', 'Other Costs'],
+                    datasets: [{
+                        label: 'Annual Cost Breakdown',
+                        data: [feed, labor, vet, depreciation, interest, other],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 159, 64, 0.8)'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Annual Cost Structure Breakdown' }
+                    }
+                }
+            });
+            openModal('chartModal');
+        }
+
+        function showFodderCalculation() {
+            if (!reportData.inputs) {
+                showNotification('Please calculate a report first.', true);
+                return;
+            }
+            const { inputs, herd } = reportData;
+            
+            const dailyGreen = herd.totalFeedableUnits * inputs.feed.green;
+            const dailyDry = herd.totalFeedableUnits * inputs.feed.dry;
+            const totalDaily = dailyGreen + dailyDry;
+
+            const annualGreen = dailyGreen * 365;
+            const annualDry = dailyDry * 365;
+            const totalAnnual = annualGreen + annualDry;
+
+            setHTML('fodderContent', `
+                <p class="text-gray-600 mb-4">This report breaks down the total roughage (fodder) required for your herd based on an average feedable unit (adults + growing kids).</p>
+                <p class="text-sm mb-4">Total Feedable Units (Adult Equivalents): <strong>${herd.totalFeedableUnits.toFixed(1)}</strong></p>
+                <table class="report-table text-sm">
+                    <tr class="sub-header"><td colspan="3">Daily Fodder Requirement</td></tr>
+                    <tr><td>Green Roughage</td><td class="text-right">${dailyGreen.toLocaleString(undefined, {maximumFractionDigits: 0})} Kg</td><td class="text-right">${(dailyGreen/1000).toFixed(2)} Tonnes</td></tr>
+                    <tr><td>Dry Roughage</td><td class="text-right">${dailyDry.toLocaleString(undefined, {maximumFractionDigits: 0})} Kg</td><td class="text-right">${(dailyDry/1000).toFixed(2)} Tonnes</td></tr>
+                    <tr class="total-row"><td>Total Daily</td><td class="text-right">${totalDaily.toLocaleString(undefined, {maximumFractionDigits: 0})} Kg</td><td class="text-right">${(totalDaily/1000).toFixed(2)} Tonnes</td></tr>
+                    
+                    <tr class="sub-header"><td colspan="3">Annual Fodder Requirement</td></tr>
+                    <tr><td>Green Roughage</td><td class="text-right">${annualGreen.toLocaleString(undefined, {maximumFractionDigits: 0})} Kg</td><td class="text-right">${(annualGreen/1000).toFixed(2)} Tonnes</td></tr>
+                    <tr><td>Dry Roughage</td><td class="text-right">${annualDry.toLocaleString(undefined, {maximumFractionDigits: 0})} Kg</td><td class="text-right">${(annualDry/1000).toFixed(2)} Tonnes</td></tr>
+                    <tr class="total-row"><td>Total Annual</td><td class="text-right">${totalAnnual.toLocaleString(undefined, {maximumFractionDigits: 0})} Kg</td><td class="text-right">${(totalAnnual/1000).toFixed(2)} Tonnes</td></tr>
+                </table>
+            `);
+            openModal('fodderModal');
+        }
+
+        function showFodderYieldAnalysis() {
+            if (!reportData.inputs || !reportData.land) {
+                showNotification('Please calculate a report first.', true);
+                return;
+            }
+            const { inputs, land, herd } = reportData;
+
+            const fodderLandAcres = land.fodder;
+            const yieldPerAcre = inputs.fodderYield; 
+            const totalProductionKg = fodderLandAcres * yieldPerAcre;
+
+            const annualRequirementKg = (herd.totalFeedableUnits * (inputs.feed.green + inputs.feed.dry)) * 365;
+
+            const surplusDeficitKg = totalProductionKg - annualRequirementKg;
+            const surplusDeficitClass = surplusDeficitKg >= 0 ? 'profit' : 'loss';
+            const surplusDeficitLabel = surplusDeficitKg >= 0 ? 'Surplus' : 'Deficit';
+            const fodderTypeName = inputs.activeFodder.charAt(0).toUpperCase() + inputs.activeFodder.slice(1);
+
+            setHTML('fodderYieldContent', `
+                <p class="text-gray-600 mb-4">This analysis estimates your total fodder production based on the allocated land and compares it against your herd's annual requirement.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                    <div class="p-4 bg-gray-100 rounded-lg">
+                        <p class="font-semibold">Selected Fodder Type</p>
+                        <p class="text-xl text-gray-800">${fodderTypeName}</p>
+                    </div>
+                    <div class="p-4 bg-gray-100 rounded-lg">
+                        <p class="font-semibold">Yield per Acre</p>
+                        <p class="text-xl text-gray-800">${(yieldPerAcre / 1000).toLocaleString()} Tonnes/Year</p>
+                    </div>
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <p class="font-semibold text-blue-800">Allocated Fodder Land</p>
+                        <p class="text-2xl font-bold text-blue-700">${fodderLandAcres.toFixed(2)} acres</p>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-lg">
+                        <p class="font-semibold text-green-800">Total Estimated Production</p>
+                        <p class="text-2xl font-bold text-green-700">${(totalProductionKg / 1000).toFixed(2)} Tonnes/Year</p>
+                    </div>
+                    <div class="p-4 bg-yellow-50 rounded-lg col-span-1 md:col-span-2">
+                        <p class="font-semibold text-yellow-800">Total Annual Requirement</p>
+                        <p class="text-2xl font-bold text-yellow-700">${(annualRequirementKg / 1000).toFixed(2)} Tonnes/Year</p>
+                    </div>
+                    <div class="p-4 ${surplusDeficitKg >= 0 ? 'bg-green-100' : 'bg-red-100'} rounded-lg col-span-1 md:col-span-2">
+                        <p class="font-semibold ${surplusDeficitClass}">${surplusDeficitLabel}</p>
+                        <p class="text-3xl font-bold ${surplusDeficitClass}">${(surplusDeficitKg / 1000).toFixed(2)} Tonnes/Year</p>
+                    </div>
+                </div>
+            `);
+            openModal('fodderYieldModal');
+        }
+        
+        function generatePDF() {
+            if (!reportData.inputs) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const { inputs, capital, income, expenses, annualNetProfit, land, herd } = reportData;
+
+            // Helper to add a title and table, and return the new Y position
+            function addSection(title, head, body, startY) {
+                doc.setFontSize(14);
+                doc.setTextColor(40);
+                doc.setFont('helvetica', 'bold');
+                doc.text(title, 14, startY);
+                doc.autoTable({
+                    startY: startY + 5,
+                    head: head,
+                    body: body,
+                    theme: 'grid',
+                    headStyles: { fillColor: [22, 160, 133] },
+                    styles: { fontSize: 9 },
+                    margin: { left: 14, right: 14 }
+                });
+                return doc.autoTable.previous.finalY + 10;
+            }
+
+            // --- PDF Header ---
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Goat Breeding Project - Annual Financial Report", doc.internal.pageSize.getWidth() / 2, 20, { align: "center" });
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            const projectName = document.getElementById('projectName').value || 'Untitled Project';
+            doc.text(`Project Name: ${projectName}`, doc.internal.pageSize.getWidth() / 2, 28, { align: "center" });
+            doc.text(`Report Generated: ${new Date().toLocaleDateString('en-GB')}`, doc.internal.pageSize.getWidth() / 2, 34, { align: "center" });
+
+
+            // --- Section 1: Project Basics ---
+            let currentY = 45;
+            const basicsBody = [
+                ['Number of Does', `${inputs.totalDoes}`],
+                ['Number of Bucks', `${inputs.totalBucks}`],
+                ['Selected Breed', `${inputs.breed.charAt(0).toUpperCase() + inputs.breed.slice(1)}`],
+                ['Kidding Interval', `${inputs.kiddingInterval} Months`],
+                ['Kidding Rate', `${inputs.kiddingRate} kids/doe`],
+                ['Kid Mortality', `${(inputs.kidMortalityRate * 100).toFixed(1)} %`],
+                ['Annual Cull Rate', `${(inputs.cullRate * 100).toFixed(1)} %`],
+                ['Kids Sold Per Year', `${Math.floor(herd.kidsToSell)}`],
+                ['Avg. Sale Weight (Kid)', `${inputs.saleWeightKids} Kg`],
+            ];
+            currentY = addSection("1. Herd & Production Assumptions", [['Parameter', 'Value']], basicsBody, currentY);
+
+            // --- Section 2: Capital Investment ---
+            const capitalBody = [
+                ['Infrastructure Land (' + land.housing.toFixed(2) + ' acres)', formatCurrency(land.housing * inputs.landCostPerAcre)],
+                ['Fodder Land (' + land.fodder.toFixed(2) + ' acres)', formatCurrency(land.fodder * inputs.landCostPerAcre)],
+                ['Buildings & Sheds', formatCurrency(capital.buildings)],
+                ['Equipment & Machinery', formatCurrency(capital.equipment)],
+                ['Initial Livestock Purchase', formatCurrency(capital.livestock)],
+                [{ content: 'Total Initial Investment', styles: { fontStyle: 'bold' } },
+                 { content: formatCurrency(capital.totalFixed + capital.livestock), styles: { fontStyle: 'bold' } }]
+            ];
+            currentY = addSection("2. Initial Capital Investment", [['Item', 'Cost (BDT)']], capitalBody, currentY);
+
+            doc.addPage();
+            currentY = 25; // Reset Y for new page
+
+            // --- Section 3: Annual Financial Breakdown ---
+            const financialsBody = [
+                // Income
+                [{ content: "Annual Income", colSpan: 2, styles: { halign: 'center', fillColor: [243, 244, 246], textColor: 20 } }],
+                ['Sale of Kids', formatCurrency(income.kidSale)],
+                ['Sale of Cull Animals', formatCurrency(income.cullSale)],
+                ['Manure & Other Income', formatCurrency(income.manure)],
+                [{ content: "Total Annual Income", styles: { fontStyle: 'bold' } },
+                 { content: formatCurrency(income.total), styles: { fontStyle: 'bold' } }],
+                // Expenses
+                [{ content: "Annual Expenses", colSpan: 2, styles: { halign: 'center', fillColor: [243, 244, 246], textColor: 20 } }],
+                ['Feed Cost', formatCurrency(expenses.feed)],
+                ['Labor Cost', formatCurrency(expenses.labor)],
+                ['Vet & Medicine Cost', formatCurrency(expenses.vet)],
+                ['Other Costs', formatCurrency(expenses.other)],
+                ['Depreciation', formatCurrency(expenses.depreciation)],
+                ['Interest on Loan', formatCurrency(expenses.interest)],
+                [{ content: "Total Annual Expenses", styles: { fontStyle: 'bold' } },
+                 { content: formatCurrency(expenses.total), styles: { fontStyle: 'bold' } }],
+                // Net Profit
+                [{ content: "Annual Net Profit", styles: { fontStyle: 'bold', fontSize: 11 } },
+                 { content: formatCurrency(annualNetProfit), styles: { fontStyle: 'bold', fontSize: 11 } }]
+            ];
+            currentY = addSection("3. Annual Financial Breakdown", [['Description', 'Amount (BDT)']], financialsBody, currentY);
+
+            // --- Section 4: Funding Details ---
+            const fundingBody = [
+                ['Own Investment', formatCurrency(inputs.ownInvestment)],
+                ['Bank Loan', formatCurrency(inputs.bankLoan)],
+                ['Annual Interest Rate', `${(inputs.interestRate * 100).toFixed(1)} %`],
+                ['Loan Term', `${inputs.loanTerm} Years`],
+                ['Annual Asset Depreciation', `${(inputs.depreciationRate * 100).toFixed(1)} %`]
+            ];
+            addSection("4. Funding & Financial Assumptions", [['Parameter', 'Value']], fundingBody, currentY);
+
+            // --- Footer ---
+            const developerName = "Adapted from model by: MD AKRAMUL HAQUE, BCS (Livestock)";
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8); doc.setTextColor(100);
+                doc.text(developerName, doc.internal.pageSize.getWidth() / 2, 10, { align: 'center' });
+                doc.text(`Page ${i} of ${pageCount}`, doc.internal.pageSize.getWidth() - 20, doc.internal.pageSize.getHeight() - 10);
+            }
+            
+            doc.save(`${projectName.replace(/\s/g, '_')}_Goat_Report.pdf`);
+        }
+        
+        // --- SIMULATION FUNCTION (for Sensitivity, Monte Carlo, AI) ---
+        function calculateProfitForSimulation(simInputs) {
+            // Replicates the core logic of calculate() without UI updates
+            const geneticFactors = breedDatabase[simInputs.breed] ? {
+                kiddingRate: (breedDatabase[simInputs.breed].kiddingRate * simInputs.geneticsScore) / simInputs.kiddingRate,
+                feedEfficiency: 1 / (breedDatabase[simInputs.breed].feedEfficiency * simInputs.geneticsScore),
+                premium: Math.max(0, (breedDatabase[simInputs.breed].quality * simInputs.geneticsScore - 0.7) * 0.25)
+            } : { kiddingRate: 1, feedEfficiency: 1, premium: 0 };
+            
+            const effectiveKiddingRate = simInputs.kiddingRate * geneticFactors.kiddingRate;
+            const kiddingsPerYear = simInputs.kiddingInterval > 0 ? 12 / simInputs.kiddingInterval : 0;
+            
+            // Calculate production based on average does alive during the year
+            const avgProducingDoes = simInputs.totalDoes * (1 - simInputs.doeMortalityRate / 2);
+            const totalKidsBorn = avgProducingDoes * kiddingsPerYear * effectiveKiddingRate;
+            const totalKidsSurviving = totalKidsBorn * (1 - simInputs.kidMortalityRate);
+            
+            // Calculate replacements needed to keep herd size constant
+            const doesDie = simInputs.totalDoes * simInputs.doeMortalityRate;
+            const doesToCull = simInputs.totalDoes * simInputs.cullRate; // Cull from the starting herd
+            const totalDoesRemoved = doesDie + doesToCull;
+            const kidsForReplacement = totalDoesRemoved; 
+            
+            const kidsToSell = totalKidsSurviving - kidsForReplacement;
+            
+            const bucksToCull = simInputs.totalBucks * 0.25; // Assuming bucks are replaced every 4 years
+
+            // Calculate average herd size for feed calculation
+            const adultEquivalents = simInputs.totalDoes + simInputs.totalBucks; // Based on constant adult herd
+            const kidEquivalents = totalKidsSurviving * (simInputs.saleAgeKids / 12);
+            const totalFeedableUnits = adultEquivalents + kidEquivalents;
+            
+            const laborers = Math.ceil(simInputs.totalDoes / 50);
+            const landSqMetersPerDoe = 10;
+            const sqMetersToAcres = 4046.86;
+            const requiredLandAcres = (simInputs.totalDoes * landSqMetersPerDoe) / sqMetersToAcres;
+
+            const dailyFodderPerUnit = simInputs.feed.green + simInputs.feed.dry;
+            const annualFodderRequirement = totalFeedableUnits * dailyFodderPerUnit * 365;
+            const requiredFodderLandAcres = simInputs.fodderYield > 0 ? annualFodderRequirement / simInputs.fodderYield : 0;
+            
+            const calculatedLandCost = (requiredLandAcres + requiredFodderLandAcres) * simInputs.landCostPerAcre;
+            const totalLivestockCost = (simInputs.totalDoes * simInputs.doePrice) + (simInputs.totalBucks * simInputs.buckPrice);
+            
+            const capital = {
+                totalFixed: calculatedLandCost + simInputs.buildingCost + simInputs.equipmentPrice
+            };
+            
+            const effectiveSalePrice = simInputs.salePricePerKg * (1 + geneticFactors.premium);
+            const income = {
+                kidSale: kidsToSell * simInputs.saleWeightKids * effectiveSalePrice,
+                cullSale: (doesToCull + bucksToCull) * simInputs.cullPrice,
+                manure: simInputs.manureIncome,
+            };
+            income.total = income.kidSale + income.cullSale + income.manure;
+
+            const dailyFeedCostPerUnit = (simInputs.feed.conc * simInputs.concentratePrice) + (simInputs.feed.green * simInputs.greenRoughagePrice) + (simInputs.feed.dry * simInputs.dryRoughagePrice);
+            const annualFeedCost = totalFeedableUnits * dailyFeedCostPerUnit * 365 * geneticFactors.feedEfficiency;
+            const annualLaborCost = laborers * simInputs.laborSalary * 12;
+            const annualVetCost = (adultEquivalents + totalKidsSurviving) * simInputs.vetCostPerGoat;
+
+            const expenses = {
+                feed: annualFeedCost,
+                labor: annualLaborCost,
+                vet: annualVetCost,
+                other: simInputs.otherCosts,
+                interest: simInputs.bankLoan * simInputs.interestRate,
+                depreciation: capital.totalFixed * simInputs.depreciationRate,
+            };
+            expenses.total = expenses.feed + expenses.labor + expenses.vet + expenses.other + expenses.interest + expenses.depreciation;
+            
+            return income.total - expenses.total;
+        }
+
+        function runMonteCarlo(runs = 1000) {
+            if (!reportData.inputs) {
+                showNotification('Please calculate a base report first.', true);
+                return;
+            }
+
+            const baseInputs = reportData.inputs;
+            let profits = [];
+
+            const feedVolatility = getVal('feedVolatility') / 100;
+            const priceVolatility = getVal('priceDropRisk') / 100;
+            const diseaseRisk = getVal('diseaseRisk') / 100;
+
+            for (let i = 0; i < runs; i++) {
+                const simInputs = JSON.parse(JSON.stringify(baseInputs)); // Deep copy
+
+                // Apply random variance to key inputs
+                simInputs.kiddingRate *= (1 + (Math.random() - 0.5) * 2 * 0.15); // +/- 15% variance
+                simInputs.salePricePerKg *= (1 + (Math.random() - 0.5) * 2 * priceVolatility);
+                simInputs.concentratePrice *= (1 + (Math.random() - 0.5) * 2 * feedVolatility);
+                simInputs.kidMortalityRate = Math.max(0, simInputs.kidMortalityRate * (1 + (Math.random() - 0.2) * 2 * (diseaseRisk * 5))); // Skewed high
+                simInputs.doeMortalityRate = Math.max(0, simInputs.doeMortalityRate * (1 + (Math.random() - 0.2) * 2 * (diseaseRisk * 5))); 
+
+                const simProfit = calculateProfitForSimulation(simInputs);
+                profits.push(simProfit);
+            }
+
+            // Analyze results
+            profits.sort((a, b) => a - b); // Sort for percentile calculation
+            const avgProfit = profits.reduce((a, b) => a + b, 0) / runs;
+            const lossCount = profits.filter(p => p < 0).length;
+            const probabilityOfLoss = (lossCount / runs) * 100;
+            const worstCaseProfit = profits[Math.floor(runs * 0.05)]; // 5th percentile
+            const bestCaseProfit = profits[Math.floor(runs * 0.95)]; // 95th percentile
+
+            // Display results in a modal
+            const contentEl = document.getElementById('monteCarloContent');
+            contentEl.innerHTML = `
+                <p class="text-gray-600 mb-4">Based on ${runs} simulations with random variations in prices, kidding rate, and mortality.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-1">Average Simulated Profit</p>
+                        <p class="text-2xl font-bold text-blue-800 ${avgProfit >= 0 ? 'profit' : 'loss'}">${formatCurrency(avgProfit)}</p>
+                    </div>
+                    <div class="p-4 bg-red-50 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-1">Probability of Loss</p>
+                        <p class="text-2xl font-bold text-red-800">${probabilityOfLoss.toFixed(1)}%</p>
+                    </div>
+                    <div class="p-4 bg-orange-50 rounded-lg md:col-span-1">
+                        <p class="text-sm text-gray-600 mb-1">Worst Case (5th Percentile)</p>
+                        <p class="text-xl font-bold text-orange-800 ${worstCaseProfit >= 0 ? 'profit' : 'loss'}">${formatCurrency(worstCaseProfit)}</p>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-lg md:col-span-1">
+                        <p class="text-sm text-gray-600 mb-1">Best Case (95th Percentile)</p>
+                        <p class="text-xl font-bold text-green-800 ${bestCaseProfit >= 0 ? 'profit' : 'loss'}">${formatCurrency(bestCaseProfit)}</p>
+                    </div>
+                </div>
+                <div class="mt-4 text-xs text-gray-500 text-center">
+                    Note: This is a simplified simulation and does not account for all possible market events. It assumes a normal distribution of random variables.
+                </div>
+            `;
+            openModal('monteCarloModal');
+        }
+
+        // Simple GHG calculator (based on IPCC/FAO averages for Goats)
+        function calculateSustainability() {
+            if (!reportData.inputs) return;
+
+            const diet = reportData.inputs.feed;
+            const grossEnergy = calculateGrossEnergy(diet) * reportData.herd.totalFeedableUnits; // Mcal/day for whole herd
+            const methaneEmissions = predictMethaneProduction(grossEnergy); // g CH4/day for whole herd
+            const totalMethaneAnnual = methaneEmissions * 365; // g CH4/year
+            const totalMethaneCO2e = totalMethaneAnnual * 28; // g CO2e (GWP of CH4 is ~28)
+
+            const totalFeed = reportData.herd.totalFeedableUnits * (diet.conc + diet.green + diet.dry) * 365;
+            const emissionsFeed = totalFeed * 0.4 * 1000; // g CO2e (0.4 Kg CO2e/Kg goat feed)
+            const emissionsManure = (reportData.herd.totalFeedableUnits * 50) * 1000; // g CO2e (simplified)
+
+            const totalEmissions = (totalMethaneCO2e + emissionsFeed + emissionsManure) / 1000; // Convert total grams to Kg
+            
+            const totalMeat = (reportData.herd.kidsToSell * reportData.inputs.saleWeightKids) + ((reportData.herd.doesToCull + reportData.herd.bucksToCull) * 30); // Avg 30kg cull
+            const footprint = totalMeat > 0 ? (totalEmissions / totalMeat).toFixed(2) : 0;
+            
+            reportData.sustainability = { totalFeed, totalEmissions, totalMeat, footprint, methane: totalMethaneCO2e / 1000 };
+
+            setHTML('sustainability-output', `
+                <p class="text-lg font-semibold text-green-800">Est. Carbon Footprint</p>
+                <p class="text-3xl font-bold text-green-600 mt-1">${footprint}</p>
+                <p class="text-sm text-gray-600">Kg CO2e / Kg Meat Produced</p>
+            `);
+        }
+
+        function showSustainabilityReport() {
+            if (!reportData.sustainability) {
+                showNotification('Please calculate a report first.', true);
+                return;
+            }
+            const { totalEmissions, totalMeat, footprint, methane } = reportData.sustainability;
+
+            setHTML('sustainabilityContent', `
+                <p class="text-gray-600 mb-4">This report provides a high-level estimate of the project's carbon footprint based on IPCC/FAO averages for feed, manure, and enteric fermentation (methane) for goats.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div class="p-4 bg-yellow-50 rounded-lg col-span-1 md:col-span-2">
+                         <p class="font-semibold text-yellow-800">Total Estimated Emissions (Annual)</p>
+                         <p class="text-3xl font-bold text-yellow-700">${(totalEmissions/1000).toFixed(1)} Tonnes CO2e</p>
+                    </div>
+                     <div class="p-4 bg-gray-100 rounded-lg">
+                        <p class="font-semibold">From Methane (Enteric)</p>
+                        <p class="text-2xl">${methane.toFixed(0)} Kg CO2e</p>
+                    </div>
+                    <div class="p-4 bg-gray-100 rounded-lg">
+                        <p class="font-semibold">From Feed & Manure</p>
+                        <p class="text-2xl">${(totalEmissions - methane).toFixed(0)} Kg CO2e</p>
+                    </div>
+                </div>
+                 <div class="mt-6 p-4 bg-green-100 rounded-lg text-center">
+                    <p class="text-lg font-semibold text-green-800">Final Carbon Footprint</p>
+                    <p class="text-4xl font-bold text-green-600">${footprint} <span class="text-lg font-medium">Kg CO2e / Kg Meat</span></p>
+                </div>
+                 <div class="mt-4 text-xs text-gray-500 text-center">
+                    Disclaimer: This is a simplified model for illustrative purposes. Methane GWP is 28.
+                </div>
+            `);
+            openModal('sustainabilityModal');
+        }
+        
+        // --- Advanced Ration, Genetics & AI Functions ---
+        const breedDatabase = {
+            'black_bengal': { kiddingRate: 1.2, feedEfficiency: 1.1, quality: 0.8, health: 1.1, name: 'Black Bengal' },
+            'jamunapari': { kiddingRate: 0.9, feedEfficiency: 0.9, quality: 0.7, health: 0.9, name: 'Jamunapari Cross' },
+            'boer': { kiddingRate: 1.1, feedEfficiency: 0.8, quality: 0.95, health: 0.8, name: 'Boer Cross' },
+            'barbari': { kiddingRate: 1.0, feedEfficiency: 1.0, quality: 0.75, health: 1.0, name: 'Barbari' },
+            'local_cross': { kiddingRate: 1.0, feedEfficiency: 1.0, quality: 0.7, health: 1.0, name: 'Local Cross' }
+        };
+
+        function calculateGeneticPotential(updateUI = true) {
+            const breed = document.getElementById('breedSelection').value;
+            const geneticsScore = getVal('geneticsScore');
+            const base = breedDatabase[breed];
+
+            const expectedKiddingRate = base.kiddingRate * (1 + (geneticsScore - 1) * 0.5); // Apply score
+            const feedEfficiency = 1 / (base.feedEfficiency * (1 + (geneticsScore - 1) * 0.5)); // Inverse relationship
+            const qualityScore = base.quality * geneticsScore;
+            const premium = Math.max(0, (qualityScore - 0.7) * 0.35); // 35% premium potential for high quality
+
+            if (updateUI) {
+                document.getElementById('kiddingRate').value = expectedKiddingRate.toFixed(2);
+                
+                let scoreLabel = 'Average';
+                if(geneticsScore > 0.9) scoreLabel = 'Good';
+                if(geneticsScore > 1.1) scoreLabel = 'Superior';
+                document.getElementById('geneticsScoreLabel').textContent = `${geneticsScore.toFixed(2)} (${scoreLabel})`;
+                
+                setHTML('genetic-potential-output', `
+                    <h4 class="font-semibold text-indigo-800">Genetic Impact</h4>
+                    <p class="text-sm mt-2"><strong>Expected Kidding Rate:</strong> <span class="font-bold">${expectedKiddingRate.toFixed(2)}</span></p>
+                    <p class="text-sm"><strong>Feed Efficiency:</strong> <span class="font-bold">${(1/feedEfficiency).toFixed(2)}x</span></p>
+                    <p class="text-sm"><strong>Sale Price Premium:</strong> <span class="font-bold">${(premium * 100).toFixed(1)}%</span></p>
+                `);
+                calculate();
+            }
+            
+            // Return factors for internal calculation
+            // Base kidding rate is already in the input, so factor is relative to that.
+            return { 
+                kiddingRate: (base.kiddingRate * (1 + (geneticsScore - 1) * 0.5)) / (baseValues['kiddingRate'] || 1.8), // Use default if base not set
+                feedEfficiency, 
+                premium 
+            };
+        }
+        
+        function showGeneticAnalysis() {
+            if(!reportData.inputs) return;
+            const breed = reportData.inputs.breed;
+            const geneticsScore = reportData.inputs.geneticsScore;
+            const base = breedDatabase[breed];
+
+            const traits = {
+                prolificacy: base.kiddingRate * geneticsScore,
+                efficiency: base.feedEfficiency * geneticsScore,
+                quality: base.quality * geneticsScore,
+                health: base.health * geneticsScore
+            };
+
+            const weights = { prolificacy: 0.4, efficiency: 0.3, quality: 0.15, health: 0.15 };
+            const index = Object.keys(traits).reduce((score, trait) => score + (traits[trait] * weights[trait]), 0);
+
+            let indexEval = 'Average';
+            if (index > 0.95) indexEval = 'Good';
+            if (index > 1.05) indexEval = 'Excellent';
+            if (index > 1.15) indexEval = 'Superior';
+
+            setHTML('geneticAnalysisContent', `
+                <p class="text-gray-600 mb-4">This analysis provides a detailed look at the selected breed's traits and calculates an economic selection index to score its overall profitability potential.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="sub-section-title">Base Breed Traits (Normalized)</h3>
+                        <table class="report-table text-sm">
+                            <tr><td>Prolificacy (Kidding Rate)</td><td>${base.kiddingRate}</td></tr>
+                            <tr><td>Feed Efficiency</td><td>${base.feedEfficiency}</td></tr>
+                            <tr><td>Meat Quality</td><td>${base.quality}</td></tr>
+                            <tr><td>Hardiness / Health</td><td>${base.health}</td></tr>
+                        </table>
+                    </div>
+                    <div>
+                         <h3 class="sub-section-title">Calculated Genetic Score</h3>
+                         <div class="p-4 bg-blue-50 rounded-lg text-center">
+                             <p class="font-semibold text-blue-800">Genomic Selection Index</p>
+                             <p class="text-4xl font-bold text-blue-700">${index.toFixed(3)}</p>
+                             <p class="font-semibold text-blue-800">(${indexEval})</p>
+                         </div>
+                        <p class="text-xs text-gray-500 mt-2">This index weights prolificacy (40%), efficiency (30%), quality (15%), and health (15%) to estimate the overall economic value of the animal's genetics.</p>
+                    </div>
+                </div>
+            `);
+            openModal('geneticAnalysisModal');
+        }
+
+        const feedLibrary = { // Nutrient values per Kg of Dry Matter (Goat specific)
+            maize:            { cp: 8.5,  me: 3.3, dm: 88, type: 'conc' },
+            soybeanMeal:      { cp: 44,   me: 3.0, dm: 90, type: 'conc' },
+            wheatBran:        { cp: 16,   me: 2.8, dm: 89, type: 'conc' },
+            pakchongNapier:   { cp: 14,   me: 2.1, dm: 20, type: 'green' },
+            maizeSilage:      { cp: 8.0,  me: 2.4, dm: 35, type: 'green' },
+            riceStraw:        { cp: 4,    me: 1.8, dm: 90, type: 'dry' },
+            jackfruitLeaves:  { cp: 15,   me: 2.2, dm: 30, type: 'green' }
+        };
+
+        function calculateNutrientRequirements(weight) {
+            // Simplified requirements for a 30kg "average" goat (doe/growing kid)
+            const dmi = weight * 0.035; // Dry Matter Intake is approx 3.5% of body weight for goats
+            const total_cp_req_kg = dmi * 0.14; // 14% CP in total DMI
+            const total_me_req_mcal = dmi * 2.5; // 2.5 Mcal/Kg DM
+            
+            return { dmi, cp: total_cp_req_kg, me: total_me_req_mcal };
+        }
+        
+        function formulateRation() {
+            const avgWeight = 30; // Assume an "average" 30kg goat for formulation
+            const req = calculateNutrientRequirements(avgWeight);
+
+            // A simplified, rule-based formulation logic
+            let ration = {};
+            
+            // 1. Start with roughage (as-fed basis)
+            let greenRoughageKg = 2.0;
+            let dryRoughageKg = 0.5;
+            
+            let greenLibEntry, greenLibName;
+            if (activeFodder === 'napier') {
+                greenLibEntry = feedLibrary.pakchongNapier;
+                greenLibName = 'pakchongNapier';
+            } else if (activeFodder === 'maize') {
+                greenLibEntry = feedLibrary.maizeSilage;
+                greenLibName = 'maizeSilage';
+            } else if (activeFodder === 'jackfruit') {
+                greenLibEntry = feedLibrary.jackfruitLeaves;
+                greenLibName = 'jackfruitLeaves';
+            } else {
+                // Default to Napier if custom or other
+                greenLibEntry = feedLibrary.pakchongNapier;
+                greenLibName = 'pakchongNapier';
+            }
+            
+            ration[greenLibName] = greenRoughageKg;
+            ration['riceStraw'] = dryRoughageKg;
+            
+            // Calculate DM, CP, ME from roughage
+            let currentDM = (greenRoughageKg * (greenLibEntry.dm / 100)) + (dryRoughageKg * (feedLibrary.riceStraw.dm / 100));
+            let currentCP = (greenRoughageKg * (greenLibEntry.dm / 100) * (greenLibEntry.cp / 100)) + (dryRoughageKg * (feedLibrary.riceStraw.dm / 100) * (feedLibrary.riceStraw.cp / 100));
+            let currentME = (greenRoughageKg * (greenLibEntry.dm / 100) * greenLibEntry.me) + (dryRoughageKg * (feedLibrary.riceStraw.dm / 100) * feedLibrary.riceStraw.me);
+
+            let remainingDM = req.dmi - currentDM;
+            
+            // 2. Add concentrates to fill the gap (simple ratio)
+            const concentrateMix = { maize: 0.5, soybeanMeal: 0.2, wheatBran: 0.3 };
+            let totalConcentrateKgDM = Math.max(0, remainingDM); // Don't go negative
+
+            for (const [ingredient, percent] of Object.entries(concentrateMix)) {
+                const kgDM = totalConcentrateKgDM * percent;
+                const asFedKg = kgDM / (feedLibrary[ingredient].dm / 100);
+                ration[ingredient] = asFedKg;
+                
+                currentCP += kgDM * (feedLibrary[ingredient].cp / 100);
+                currentME += kgDM * feedLibrary[ingredient].me;
+            }
+            
+            // Display Results
+            let tableHtml = `<table class="report-table text-sm mt-4">
+                <thead><tr><th>Ingredient</th><th>Amount (Kg, As-Fed)</th></tr></thead><tbody>`;
+            let totalConc = 0;
+            let totalGreen = 0;
+            let totalDry = 0;
+
+            for(const [ing, amount] of Object.entries(ration)) {
+                tableHtml += `<tr><td>${ing.charAt(0).toUpperCase() + ing.slice(1)}</td><td>${amount.toFixed(2)}</td></tr>`;
+                const type = feedLibrary[ing]?.type;
+                if(type === 'conc') totalConc += amount;
+                if(type === 'green') totalGreen += amount;
+                if(type === 'dry') totalDry += amount;
+            }
+             tableHtml += `</tbody></table>`;
+
+            setHTML('rationContent', `
+                <p class="text-sm text-gray-600">Formulated for an average 30 Kg goat.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="sub-section-title">Nutrient Requirements</h3>
+                        <div class="p-3 bg-gray-50 rounded-lg space-y-1 text-sm">
+                            <p><strong>Dry Matter Intake (DMI):</strong> ${req.dmi.toFixed(2)} Kg/day</p>
+                            <p><strong>Crude Protein (CP):</strong> ${req.cp.toFixed(2)} Kg/day</p>
+                            <p><strong>Metabolizable Energy (ME):</strong> ${req.me.toFixed(2)} Mcal/day</p>
+                        </div>
+                         <h3 class="sub-section-title mt-4">Formulated Ration</h3>
+                        ${tableHtml}
+                    </div>
+                     <div>
+                        <h3 class="sub-section-title">Ration Analysis</h3>
+                        <div class="p-3 bg-blue-50 rounded-lg space-y-1 text-sm">
+                            <p><strong>Total CP Provided:</strong> ${currentCP.toFixed(2)} Kg (${((currentCP/req.cp)*100).toFixed(0)}% of req.)</p>
+                            <p><strong>Total ME Provided:</strong> ${currentME.toFixed(2)} Mcal (${((currentME/req.me)*100).toFixed(0)}% of req.)</p>
+                        </div>
+                        <div class="mt-4">
+                            <button id="applyRationBtn" class="action-btn bg-green-600 hover:bg-green-700 w-full">Apply This Ration</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+
+            document.getElementById('applyRationBtn').onclick = () => {
+                document.getElementById('feed_conc').value = totalConc.toFixed(1);
+                document.getElementById('feed_green').value = totalGreen.toFixed(1);
+                document.getElementById('feed_dry').value = totalDry.toFixed(1);
+                calculate();
+                closeModal('rationModal');
+                showNotification('Optimal ration applied successfully.');
+            };
+
+            openModal('rationModal');
+        }
+
+        function calculateGrossEnergy(diet) {
+            // Simplified GE calculation based on ME.
+            const me_conc = (feedLibrary.maize.me * 0.5 + feedLibrary.soybeanMeal.me * 0.2 + feedLibrary.wheatBran.me * 0.3) / (feedLibrary.maize.dm/100 * 0.5 + feedLibrary.soybeanMeal.dm/100 * 0.2 + feedLibrary.wheatBran.dm/100 * 0.3); // Weighted avg ME/Kg DM
+            const me_green = feedLibrary.pakchongNapier.me; // per Kg DM
+            const me_dry = feedLibrary.riceStraw.me; // per Kg DM
+            
+            const dm_conc = diet.conc * (feedLibrary.maize.dm/100 * 0.5 + feedLibrary.soybeanMeal.dm/100 * 0.2 + feedLibrary.wheatBran.dm/100 * 0.3);
+            const dm_green = diet.green * (feedLibrary.pakchongNapier.dm/100);
+            const dm_dry = diet.dry * (feedLibrary.riceStraw.dm/100);
+
+            const total_me = (dm_conc * me_conc) + (dm_green * me_green) + (dm_dry * me_dry);
+            return total_me / 0.82; // GE is roughly DE, and DE = ME / 0.82
+        }
+
+        function predictMethaneProduction(grossEnergy) {
+            // IPCC Tier 2 methane estimation for Goats
+            const methaneConversionRate = 0.055; // IPCC default for goats (5.5%)
+            const energyToMethaneFactor = 55.65; // Mj of energy per Kg of CH4
+            return (grossEnergy * 4.184) * methaneConversionRate / energyToMethaneFactor * 1000; // GE Mcal -> Mj, then convert to g CH4/day
+        }
+        
+        async function runAIPrediction() {
+            if (!reportData.inputs) {
+                showNotification('Please calculate a base report first.', true);
+                return;
+            }
+
+            const btn = document.getElementById('runPredictionBtn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Simulating Model...`;
+            btn.disabled = true;
+
+            await new Promise(resolve => setTimeout(resolve, 2500)); // Simulate training/prediction
+
+            const baseInputs = reportData.inputs;
+            let bestProfit = -Infinity;
+            let optimalHerdSize = 0;
+            let baseProfit = reportData.annualNetProfit;
+
+            for (let herdSize = 10; herdSize <= 200; herdSize += 10) {
+                 const simInputs = JSON.parse(JSON.stringify(baseInputs));
+                 simInputs.totalDoes = herdSize;
+                 simInputs.totalBucks = Math.max(1, Math.ceil(herdSize / 25)); // Scale bucks with does
+
+                 const simProfit = calculateProfitForSimulation(simInputs);
+                 
+                 if (simProfit > bestProfit) {
+                    bestProfit = simProfit;
+                    optimalHerdSize = herdSize;
+                 }
+            }
+            
+            let confidence = 95 - (getVal('feedVolatility') * 0.2) - (getVal('priceDropRisk') * 0.3) - (getVal('diseaseRisk') * 0.5);
+            confidence = Math.max(75, confidence); // Cap confidence floor
+
+            setHTML('predictionContent', `
+                 <p class="text-gray-600 mb-4">The model has analyzed your cost structure to forecast the herd size with the highest potential annual profit.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                    <div class="p-4 bg-gray-100 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-1">Current Herd Size (Does)</p>
+                        <p class="text-3xl font-bold text-gray-800">${baseInputs.totalDoes}</p>
+                        <p class="text-sm text-gray-600 mt-1">Profit: ${formatCurrency(baseProfit)}</p>
+                    </div>
+                     <div class="p-4 bg-green-50 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-1">Optimal Herd Size (Does)</p>
+                        <p class="text-3xl font-bold text-green-800">${optimalHerdSize}</p>
+                        <p class="text-sm text-gray-600 mt-1">Est. Profit: ${formatCurrency(bestProfit)}</p>
+                    </div>
+                    <div class="p-4 bg-indigo-50 rounded-lg col-span-2">
+                        <p class="text-sm text-gray-600 mb-1">Prediction Confidence</p>
+                        <p class="text-2xl font-bold text-indigo-800">${confidence.toFixed(1)}%</p>
+                         <p class="text-xs text-gray-500 mt-1">Confidence is lowered by market and health risk factors.</p>
+                    </div>
+                </div>
+                <p class="text-xs text-center mt-4 text-gray-500">Note: This model assumes costs (like labor and land) scale perfectly and does not account for diminishing returns at very large sizes.</p>
+            `);
+
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            openModal('predictionModal');
+        }
+
+        async function runBodyConditionAnalysis() {
+             if (!reportData.inputs) {
+                showNotification('Please calculate a report first.', true);
+                return;
+            }
+
+            const btn = document.getElementById('runBCSBtn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Analyzing...`;
+            btn.disabled = true;
+
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate analysis
+
+            const { inputs } = reportData;
+            // Simplified BCS calculation for goats (1-5 scale)
+            let bcs = 2.8; // Start from a lean-moderate baseline
+            bcs += (inputs.feed.conc - 0.3) * 3; // Concentrate amount has a strong influence
+            bcs -= (inputs.feed.green - 2.0) * 0.1; // More roughage = slightly leaner
+            bcs += (inputs.geneticsScore - 1.0) * 0.5; // Better genetics = better condition
+            
+            bcs = Math.max(1, Math.min(5, bcs)); // Clamp between 1-5
+
+            let confidence = 98 - (getVal('diseaseRisk') * 0.5);
+
+            let recommendations = '';
+            let alerts = '';
+            if (bcs < 2.5) {
+                recommendations = "Increase energy and protein in the ration, especially for lactating does and growing kids. The current diet may be insufficient. Use the Ration Formulator.";
+                alerts = `<div class="p-3 bg-red-100 text-red-800 rounded-lg font-semibold">Health Alert: Herd is under-conditioned (BCS < 2.5). High risk of low prolificacy and poor kid growth.</div>`;
+            } else if (bcs > 4.0) {
+                 recommendations = "Reduce energy content for dry does and bucks. Excess condition is costly and can lead to kidding difficulties. Target BCS 3.0-3.5 for breeding does.";
+                 alerts = `<div class="p-3 bg-yellow-100 text-yellow-800 rounded-lg font-semibold">Efficiency Alert: Herd is over-conditioned (BCS > 4.0). This is expensive and can reduce fertility.</div>`;
+            } else {
+                recommendations = "The current feeding plan appears to be effective. Maintain BCS 3.0-3.5 for breeding does and ensure kids have adequate nutrition.";
+                 alerts = `<div class="p-3 bg-green-100 text-green-800 rounded-lg font-semibold">No Alerts: Herd condition is within the optimal range (BCS 2.5-4.0).</div>`;
+            }
+
+            setHTML('bcsContent', `
+                 <p class="text-gray-600 mb-4">This simulated analysis estimates the average herd Body Condition Score (BCS) on the 1-5 scale for goats.</p>
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <p class="font-semibold text-blue-800">Est. Average BCS</p>
+                        <p class="text-4xl font-bold text-blue-700">${bcs.toFixed(1)}/5</p>
+                    </div>
+                     <div class="p-4 bg-indigo-50 rounded-lg">
+                        <p class="font-semibold text-indigo-800">Confidence</p>
+                        <p class="text-4xl font-bold text-indigo-700">${confidence.toFixed(0)}%</p>
+                    </div>
+                </div>
+                 <div class="mt-6 space-y-4">
+                    <div>
+                        <h3 class="sub-section-title">Health Alerts</h3>
+                        ${alerts}
+                    </div>
+                    <div>
+                        <h3 class="sub-section-title">Recommendations</h3>
+                        <p>${recommendations}</p>
+                    </div>
+                </div>
+            `);
+
+
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            openModal('bcsModal');
+        }
+
+
+        // --- EVENT LISTENERS ---
+        const debouncedCalc = debounce(calculate, 400);
+
+        document.querySelectorAll('.input-field').forEach(input => {
+            if (input.id.includes('Risk') || input.id.includes('Volatility') || input.id.includes('priceDrop')) {
+                 input.addEventListener('input', calculateRisk);
+            } else if (!['breedSelection', 'geneticsScore'].includes(input.id)) {
+                 input.addEventListener('input', () => {
+                    activeScenario = 'base';
+                    document.querySelectorAll('#scenario-buttons .scenario-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelector('[onclick="runScenario(\'base\')"]').classList.add('active');
+                    debouncedCalc();
+                });
+            }
+        });
+        
+        document.getElementById('fodder-type-selector').addEventListener('click', (e) => {
+            if (e.target.classList.contains('fodder-btn')) {
+                document.querySelectorAll('.fodder-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                activeFodder = e.target.dataset.fodder;
+                document.getElementById('custom-fodder-yield-wrapper').classList.toggle('hidden', activeFodder !== 'custom');
+                calculate();
+            }
+        });
+        
+        document.getElementById('breedSelection').addEventListener('input', calculateGeneticPotential);
+        document.getElementById('geneticsScore').addEventListener('input', calculateGeneticPotential);
+
+        document.getElementById('saveBtn').addEventListener('click', saveProject);
+        document.getElementById('loadBtn').addEventListener('click', loadProject);
+        document.getElementById('fetchPriceBtn').addEventListener('click', fetchMarketPrices);
+        document.getElementById('steadyStateBtn').addEventListener('click', showSteadyStateLogic);
+        document.getElementById('kpiBtn').addEventListener('click', showKPIs);
+        document.getElementById('breakEvenBtn').addEventListener('click', showBreakEven);
+        document.getElementById('projection5YearBtn').addEventListener('click', show5YearProjections);
+        document.getElementById('amortizationBtn').addEventListener('click', showAmortization);
+        document.getElementById('loanRepaymentBtn').addEventListener('click', showLoanRepayment);
+        document.getElementById('sensitivityBtn').addEventListener('click', showSensitivity);
+        document.getElementById('visualizeBtn').addEventListener('click', showVisualization);
+        document.getElementById('downloadPdfBtn').addEventListener('click', generatePDF);
+        document.getElementById('printBtn').addEventListener('click', () => window.print());
+        document.getElementById('monteCarloBtn').addEventListener('click', runMonteCarlo);
+        document.getElementById('sustainabilityBtn').addEventListener('click', showSustainabilityReport);
+        document.getElementById('fodderCalcBtn').addEventListener('click', showFodderCalculation);
+        document.getElementById('fodderYieldBtn').addEventListener('click', showFodderYieldAnalysis);
+        document.getElementById('formulateRationBtn').addEventListener('click', formulateRation);
+        document.getElementById('guideBtn').addEventListener('click', showGuide);
+        document.getElementById('geneticAnalysisBtn').addEventListener('click', showGeneticAnalysis);
+        document.getElementById('runPredictionBtn').addEventListener('click', runAIPrediction);
+        document.getElementById('runBCSBtn').addEventListener('click', runBodyConditionAnalysis);
+
+
+        window.onclick = (event) => { if (event.target.classList.contains('modal')) event.target.style.display = "none"; }
+        window.onload = () => {
+            calculateGeneticPotential();
+            calculateRisk();
+        };
+    </script>
+</body>
+</html>
